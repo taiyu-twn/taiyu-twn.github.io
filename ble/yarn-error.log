@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\taiyu\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js dev
+  C:\Program Files\nodejs\node.exe C:\Users\taiyu\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js build
 
 PATH: 
   C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Skype\Phone\;C:\Python27;C:\Python27\Scripts;C:\Program Files\Git\cmd;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files\Common Files\Autodesk Shared\;C:\Program Files\nodejs\;C:\Users\taiyu\AppData\Local\Microsoft\WindowsApps;C:\Users\taiyu\AppData\Local\atom\bin;C:\Users\taiyu\AppData\Roaming\npm;C:\opencv\build\bin;;C:\Program Files\Microsoft VS Code\bin
@@ -22,7 +22,7 @@ npm manifest:
     "license": "MIT",
     "private": true,
     "scripts": {
-      "dev": "cross-env NODE_ENV=development webpack-dev-server --hot",
+      "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
       "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
       "togeojson": "togeojson",
       "routing": "node scripts/routing.js",
@@ -7974,10 +7974,10 @@ Lockfile:
 
 Trace: 
   Error: Command failed.
-  Exit code: 3
+  Exit code: 1
   Command: C:\WINDOWS\system32\cmd.exe
-  Arguments: /d /s /c cross-env NODE_ENV=development webpack-dev-server --hot
-  Directory: C:\Users\taiyu\github\taiyu-chen.github.io\velotropolis
+  Arguments: /d /s /c cross-env NODE_ENV=production webpack --progress --hide-modules
+  Directory: C:\Users\taiyu\github\taiyu-twn.github.io\ble
   Output:
   
       at ProcessTermError.MessageError (C:\Users\taiyu\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:186:110)
