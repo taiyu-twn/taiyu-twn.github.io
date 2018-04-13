@@ -1,19 +1,22 @@
 <template>
   <div id="app">
-    <TheMap/>
+    <!-- <TheMap/>
     <TheCover/>
-    <TheSidebar/>
+    <TheSidebar/> -->
+    <TheDemo/>
   </div>
 </template>
 
 <script>
-import TheMap from '@/views/TheMap'
-import TheCover from '@/views/TheCover'
-import TheSidebar from '@/views/TheSidebar'
+// import TheMap from '@/views/TheMap'
+// import TheCover from '@/views/TheCover'
+// import TheSidebar from '@/views/TheSidebar'
+import TheDemo from '@/views/TheDemo'
 
 export default {
   name: 'App',
-  components: { TheMap, TheCover, TheSidebar },
+  // components: { TheMap, TheCover, TheSidebar },
+  components: { TheDemo },
   data() {
     return {}
   },
