@@ -3,163 +3,172 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taiyu Chen | Full-Stack Developer</title>
-  <meta name="description" content="Taiyu Chen - Full-Stack Developer. Portfolio, projects, and blog." />
+  <title>Taicosmia — 星語蝶花</title>
+  <meta name="description" content="Taicosmia 星語蝶花 — 每一個心意，都好好送到你手上。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* ===== CSS Variables ===== */
+    /* ===== Variables ===== */
     :root {
-      --primary: #6c63ff;
-      --secondary: #ff6584;
-      --accent: #43e97b;
-      --accent2: #f9ca24;
-      --accent3: #fd79a8;
-      --dark: #0f0e17;
-      --dark2: #1a1a2e;
-      --dark3: #16213e;
-      --text: #fffffe;
-      --text-muted: #a7a9be;
-      --card-bg: rgba(255,255,255,0.05);
-      --card-border: rgba(255,255,255,0.1);
-      --font-main: 'Inter', sans-serif;
-      --font-code: 'Fira Code', monospace;
-      --radius: 16px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --blush:    #f9c0c7;
+      --rose:     #e8859a;
+      --deep-rose:#c4617a;
+      --peach:    #fdd5b1;
+      --warm:     #f9a876;
+      --lavender: #d9c7f5;
+      --violet:   #b39ddb;
+      --soft-yellow: #fef0c7;
+      --honey:    #f5c842;
+      --mint:     #c8f0e0;
+      --cream:    #fef8f2;
+      --petal:    #fff0f5;
+      --text-dark:#4a3040;
+      --text-mid: #7a5566;
+      --text-soft:#a07888;
+      --card-bg:  rgba(255,255,255,0.75);
+      --radius-lg: 24px;
+      --radius:    16px;
+      --radius-sm: 10px;
+      --shadow:    0 8px 40px rgba(196,97,122,0.12);
+      --shadow-sm: 0 4px 20px rgba(196,97,122,0.08);
+      --font-serif: 'Noto Serif TC', 'Lora', serif;
+      --font-body:  'Nunito', 'Noto Serif TC', sans-serif;
+      --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ===== Reset & Base ===== */
+    /* ===== Reset ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: var(--font-main);
-      background: var(--dark);
-      color: var(--text);
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--text-dark);
       overflow-x: hidden;
-      line-height: 1.6;
+      line-height: 1.7;
     }
     a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
     ul { list-style: none; }
+    img { max-width: 100%; display: block; }
 
     /* ===== Scrollbar ===== */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: var(--dark2); }
-    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--petal); }
+    ::-webkit-scrollbar-thumb { background: var(--rose); border-radius: 3px; }
 
-    /* ===== Animated Background ===== */
-    .bg-canvas {
+    /* ===== Floating petals background ===== */
+    .bg-layer {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 20%, rgba(249,192,199,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(217,199,245,0.2) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(253,213,177,0.15) 0%, transparent 60%),
+        var(--cream);
+    }
+    .petals-container {
+      position: fixed;
+      inset: 0;
       z-index: -1;
-      background: var(--dark);
+      pointer-events: none;
       overflow: hidden;
     }
-    .bg-canvas::before {
-      content: '';
+    .petal {
       position: absolute;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
-      top: -100px; left: -100px;
-      animation: floatOrb 8s ease-in-out infinite;
+      opacity: 0;
+      animation: fallingPetal linear infinite;
     }
-    .bg-canvas::after {
-      content: '';
-      position: absolute;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(255,101,132,0.12) 0%, transparent 70%);
-      bottom: -50px; right: -50px;
-      animation: floatOrb 10s ease-in-out infinite reverse;
-    }
-    .orb3 {
-      position: absolute;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(67,233,123,0.08) 0%, transparent 70%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation: floatOrb 12s ease-in-out infinite 2s;
-    }
-    @keyframes floatOrb {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
+    @keyframes fallingPetal {
+      0%   { opacity: 0; transform: translateY(-60px) rotate(0deg) scale(0.8); }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(110vh) rotate(480deg) scale(1.1); }
     }
 
-    /* ===== Navigation ===== */
+    /* ===== Nav ===== */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 1000;
-      padding: 1rem 2rem;
+      z-index: 100;
+      padding: 1rem 2.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(15,14,23,0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--card-border);
+      background: rgba(254,248,242,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(232,133,154,0.15);
       transition: var(--transition);
     }
-    .nav-logo {
-      font-size: 1.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-family: var(--font-code);
+    .nav-brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .nav-brand .en {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--deep-rose);
+      letter-spacing: 0.08em;
+    }
+    .nav-brand .zh {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      letter-spacing: 0.2em;
     }
     .nav-links {
       display: flex;
-      gap: 2rem;
+      gap: 2.2rem;
       align-items: center;
     }
     .nav-links a {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      letter-spacing: 0.06em;
       position: relative;
       transition: var(--transition);
     }
     .nav-links a::after {
       content: '';
       position: absolute;
-      bottom: -4px; left: 0;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
       width: 0; height: 2px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      transition: var(--transition);
+      background: linear-gradient(90deg, var(--rose), var(--violet));
       border-radius: 2px;
+      transition: var(--transition);
     }
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--deep-rose); }
     .nav-links a:hover::after { width: 100%; }
     .nav-cta {
-      padding: 0.5rem 1.2rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 0.5rem 1.4rem;
+      background: linear-gradient(135deg, var(--rose), var(--violet));
       border-radius: 50px;
-      font-weight: 600;
-      font-size: 0.9rem;
       color: white !important;
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 14px rgba(179,157,219,0.35);
       transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(108,99,255,0.3);
     }
     .nav-cta:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(108,99,255,0.5);
+      box-shadow: 0 8px 22px rgba(179,157,219,0.5);
     }
     .nav-cta::after { display: none !important; }
 
-    /* ===== Hero Section ===== */
+    /* ===== Hero ===== */
     .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8rem 2rem 4rem;
+      padding: 8rem 2rem 5rem;
       position: relative;
     }
     .hero-inner {
-      max-width: 900px;
+      max-width: 780px;
       width: 100%;
       text-align: center;
     }
@@ -167,58 +176,84 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.4rem 1rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      padding: 0.45rem 1.2rem;
+      background: white;
+      border: 1.5px solid rgba(232,133,154,0.3);
       border-radius: 50px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      backdrop-filter: blur(10px);
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      letter-spacing: 0.12em;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-sm);
     }
-    .hero-badge .dot {
-      width: 8px; height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+    .hero-badge .butterfly { font-size: 1rem; }
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 1rem;
     }
     .hero-title {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
+      font-family: var(--font-serif);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: var(--deep-rose);
+      margin-bottom: 0.6rem;
+      position: relative;
     }
-    .hero-title .name {
-      display: block;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent3) 100%);
+    .hero-title .shimmer {
+      background: linear-gradient(
+        120deg,
+        var(--deep-rose) 0%,
+        var(--rose) 30%,
+        var(--violet) 60%,
+        var(--deep-rose) 100%
+      );
+      background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: gradientShift 4s ease infinite;
-      background-size: 200% 200%;
+      animation: shimmerText 4s linear infinite;
     }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes shimmerText {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
     }
-    .hero-title .role {
-      display: block;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      font-weight: 300;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
+    .hero-subtitle-zh {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 400;
+      color: var(--rose);
+      letter-spacing: 0.3em;
+      margin-bottom: 1.8rem;
     }
-    .hero-desc {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 3rem;
-      line-height: 1.8;
+    .hero-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+    }
+    .hero-divider span {
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--rose));
+    }
+    .hero-divider span:last-child {
+      background: linear-gradient(90deg, var(--rose), transparent);
+    }
+    .hero-tagline {
+      font-size: 1.1rem;
+      color: var(--text-mid);
+      line-height: 2;
+      margin-bottom: 3rem;
+    }
+    .hero-tagline em {
+      font-style: italic;
+      color: var(--deep-rose);
+      font-family: var(--font-serif);
     }
     .hero-actions {
       display: flex;
@@ -226,60 +261,74 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-    .btn-primary {
-      padding: 0.85rem 2.2rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    .btn-rose {
+      padding: 0.9rem 2.4rem;
+      background: linear-gradient(135deg, var(--rose), var(--deep-rose));
       border-radius: 50px;
-      font-weight: 600;
-      font-size: 1rem;
       color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      box-shadow: 0 6px 24px rgba(196,97,122,0.35);
       transition: var(--transition);
-      box-shadow: 0 4px 20px rgba(108,99,255,0.4);
-      border: none;
-      cursor: pointer;
     }
-    .btn-primary:hover {
+    .btn-rose:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(108,99,255,0.6);
+      box-shadow: 0 12px 32px rgba(196,97,122,0.5);
     }
-    .btn-outline {
-      padding: 0.85rem 2.2rem;
-      background: transparent;
-      border: 2px solid var(--card-border);
+    .btn-ghost {
+      padding: 0.9rem 2.4rem;
+      background: white;
+      border: 2px solid rgba(232,133,154,0.35);
       border-radius: 50px;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--text-muted);
+      color: var(--text-mid);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
       transition: var(--transition);
-      cursor: pointer;
     }
-    .btn-outline:hover {
-      border-color: var(--primary);
-      color: var(--text);
+    .btn-ghost:hover {
+      border-color: var(--rose);
+      color: var(--deep-rose);
       transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(108,99,255,0.2);
+      box-shadow: 0 8px 24px rgba(196,97,122,0.15);
     }
-    .hero-scroll {
+    .hero-deco {
       position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      animation: bounce 2s infinite;
+      pointer-events: none;
+      user-select: none;
     }
-    .hero-scroll svg { opacity: 0.5; }
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(8px); }
+    .hero-deco-tl {
+      top: 120px; left: 5%;
+      font-size: 4rem;
+      opacity: 0.15;
+      animation: float 6s ease-in-out infinite;
+    }
+    .hero-deco-tr {
+      top: 140px; right: 6%;
+      font-size: 3rem;
+      opacity: 0.15;
+      animation: float 7s ease-in-out infinite 1s;
+    }
+    .hero-deco-bl {
+      bottom: 100px; left: 8%;
+      font-size: 2.5rem;
+      opacity: 0.15;
+      animation: float 8s ease-in-out infinite 0.5s;
+    }
+    .hero-deco-br {
+      bottom: 120px; right: 7%;
+      font-size: 3.5rem;
+      opacity: 0.15;
+      animation: float 6s ease-in-out infinite 2s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(8deg); }
     }
 
     /* ===== Sections ===== */
-    section {
+    .section {
       padding: 6rem 2rem;
       max-width: 1100px;
       margin: 0 auto;
@@ -287,413 +336,327 @@
     .section-tag {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      font-family: var(--font-code);
-      font-size: 0.85rem;
-      color: var(--primary);
-      margin-bottom: 1rem;
-      letter-spacing: 0.1em;
+      gap: 0.6rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 0.8rem;
     }
-    .section-tag::before {
-      content: '';
-      width: 24px; height: 2px;
-      background: var(--primary);
-      border-radius: 2px;
-    }
+    .section-tag .flower { font-size: 0.9rem; }
     .section-title {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
+      font-family: var(--font-serif);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.3;
       margin-bottom: 1rem;
-      line-height: 1.2;
+    }
+    .section-title .accent {
+      color: var(--deep-rose);
     }
     .section-desc {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      max-width: 600px;
+      font-size: 1rem;
+      color: var(--text-mid);
+      max-width: 560px;
+      line-height: 1.9;
       margin-bottom: 3.5rem;
-      line-height: 1.8;
     }
+    .divider-flower {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .divider-flower::before,
+    .divider-flower::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(232,133,154,0.3), transparent);
+    }
+    .divider-flower .icon { font-size: 1.2rem; opacity: 0.6; }
 
-    /* ===== About / Skills ===== */
-    .about-grid {
+    /* ===== Concept / Brand Story ===== */
+    .concept-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 4rem;
       align-items: center;
     }
-    .about-text p {
-      color: var(--text-muted);
-      line-height: 1.9;
-      margin-bottom: 1rem;
-      font-size: 1.02rem;
+    .concept-visual {
+      position: relative;
     }
-    .about-text p strong {
-      color: var(--text);
-      font-weight: 600;
+    .concept-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
     }
-    .skills-title {
-      font-size: 1rem;
+    .concept-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blush), var(--rose), var(--violet), var(--mint));
+    }
+    .concept-big-emoji {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 1.5rem;
+      animation: float 5s ease-in-out infinite;
+    }
+    .concept-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
       font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin: 2rem 0 1rem;
+      color: var(--deep-rose);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.8rem;
     }
-    .skills-grid {
+    .concept-card-sub {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      letter-spacing: 0.15em;
+    }
+    .concept-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.6rem;
+      justify-content: center;
+      margin-top: 1.8rem;
     }
-    .skill-tag {
-      padding: 0.4rem 1rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+    .concept-tag {
+      padding: 0.3rem 0.9rem;
       border-radius: 50px;
-      font-size: 0.85rem;
-      font-family: var(--font-code);
-      color: var(--text-muted);
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
     }
-    .skill-tag:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-2px);
-    }
-    .skill-tag.highlight {
-      background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(255,101,132,0.2));
-      border-color: rgba(108,99,255,0.4);
-      color: var(--text);
-    }
-    .about-visual {
-      position: relative;
-    }
-    .about-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-    }
-    .about-card::before {
-      content: '';
+    .concept-tag.blush { background: rgba(249,192,199,0.3); color: var(--deep-rose); border: 1px solid rgba(249,192,199,0.6); }
+    .concept-tag.lavender { background: rgba(217,199,245,0.3); color: #7c5ccc; border: 1px solid rgba(217,199,245,0.6); }
+    .concept-tag.mint { background: rgba(200,240,224,0.3); color: #3a9a72; border: 1px solid rgba(200,240,224,0.6); }
+    .concept-tag.honey { background: rgba(245,200,66,0.2); color: #9a7a0a; border: 1px solid rgba(245,200,66,0.4); }
+
+    /* decorative floating elements */
+    .float-deco {
       position: absolute;
-      top: 0; left: 0;
-      right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      pointer-events: none;
+      animation: float 6s ease-in-out infinite;
     }
-    .stat-item {
-      margin-bottom: 1.5rem;
+    .float-deco-1 { top: -18px; right: -10px; font-size: 2.5rem; opacity: 0.4; animation-delay: 0s; }
+    .float-deco-2 { bottom: -12px; left: -10px; font-size: 2rem; opacity: 0.35; animation-delay: 1.5s; }
+    .float-deco-3 { top: 30%; right: -20px; font-size: 1.5rem; opacity: 0.3; animation-delay: 3s; }
+
+    .concept-text p {
+      color: var(--text-mid);
+      line-height: 2;
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
     }
-    .stat-item:last-child { margin-bottom: 0; }
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.4rem;
+    .concept-text p strong {
+      color: var(--deep-rose);
+      font-weight: 700;
     }
-    .stat-value {
-      font-size: 2.2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
+    .concept-quote {
+      margin: 2rem 0;
+      padding: 1.2rem 1.6rem;
+      border-left: 3px solid var(--rose);
+      background: rgba(249,192,199,0.1);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     }
-    .stat-sub {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
-    }
-    .stat-divider {
-      height: 1px;
-      background: var(--card-border);
-      margin: 1.5rem 0;
+    .concept-quote p {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--deep-rose);
+      line-height: 1.8;
+      margin: 0;
     }
 
-    /* ===== Projects ===== */
-    .projects-grid {
+    /* ===== Values ===== */
+    .values-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
     }
-    .project-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+    .value-card {
+      background: white;
       border-radius: var(--radius);
-      padding: 1.8rem;
+      padding: 2rem 1.6rem;
+      box-shadow: var(--shadow-sm);
       transition: var(--transition);
-      backdrop-filter: blur(10px);
+      text-align: center;
+      border: 1.5px solid transparent;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
     }
-    .project-card::before {
+    .value-card::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(108,99,255,0.05), rgba(255,101,132,0.05));
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
       opacity: 0;
       transition: var(--transition);
     }
-    .project-card:hover {
+    .value-card:hover {
       transform: translateY(-6px);
-      border-color: rgba(108,99,255,0.4);
-      box-shadow: 0 20px 60px rgba(108,99,255,0.15);
+      box-shadow: var(--shadow);
     }
-    .project-card:hover::before { opacity: 1; }
-    .project-icon {
-      width: 52px; height: 52px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 1.2rem;
-    }
-    .project-icon.purple { background: linear-gradient(135deg, rgba(108,99,255,0.3), rgba(108,99,255,0.1)); }
-    .project-icon.pink { background: linear-gradient(135deg, rgba(255,101,132,0.3), rgba(255,101,132,0.1)); }
-    .project-icon.green { background: linear-gradient(135deg, rgba(67,233,123,0.3), rgba(67,233,123,0.1)); }
-    .project-icon.yellow { background: linear-gradient(135deg, rgba(249,202,36,0.3), rgba(249,202,36,0.1)); }
-    .project-icon.teal { background: linear-gradient(135deg, rgba(0,206,201,0.3), rgba(0,206,201,0.1)); }
-    .project-name {
-      font-size: 1.15rem;
+    .value-card:hover::after { opacity: 1; }
+    .value-card.v1 { border-color: rgba(249,192,199,0.4); }
+    .value-card.v1::after { background: linear-gradient(90deg, var(--blush), var(--rose)); }
+    .value-card.v2 { border-color: rgba(217,199,245,0.4); }
+    .value-card.v2::after { background: linear-gradient(90deg, var(--lavender), var(--violet)); }
+    .value-card.v3 { border-color: rgba(200,240,224,0.4); }
+    .value-card.v3::after { background: linear-gradient(90deg, var(--mint), #3a9a72); }
+    .value-emoji { font-size: 2.8rem; display: block; margin-bottom: 1rem; }
+    .value-title {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
       font-weight: 700;
+      color: var(--text-dark);
       margin-bottom: 0.6rem;
-    }
-    .project-desc {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      flex: 1;
-      margin-bottom: 1.2rem;
-    }
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.2rem;
-    }
-    .project-tag {
-      padding: 0.25rem 0.75rem;
-      background: rgba(108,99,255,0.15);
-      border: 1px solid rgba(108,99,255,0.25);
-      border-radius: 50px;
-      font-size: 0.75rem;
-      font-family: var(--font-code);
-      color: var(--primary);
-    }
-    .project-links {
-      display: flex;
-      gap: 1rem;
-      margin-top: auto;
-    }
-    .project-link {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      transition: var(--transition);
-    }
-    .project-link:hover { color: var(--primary); }
-    .project-link svg { opacity: 0.7; }
-
-    /* ===== Blog ===== */
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-    }
-    .blog-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
-    }
-    .blog-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(108,99,255,0.4);
-      box-shadow: 0 16px 50px rgba(0,0,0,0.3);
-    }
-    .blog-header {
-      padding: 1.5rem 1.8rem 1rem;
-      border-bottom: 1px solid var(--card-border);
-      background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,101,132,0.05));
-    }
-    .blog-date {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-family: var(--font-code);
-      margin-bottom: 0.5rem;
-    }
-    .blog-category {
-      display: inline-block;
-      padding: 0.2rem 0.7rem;
-      border-radius: 50px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.8rem;
-    }
-    .blog-category.dev { background: rgba(108,99,255,0.2); color: var(--primary); }
-    .blog-category.life { background: rgba(67,233,123,0.2); color: var(--accent); }
-    .blog-category.tech { background: rgba(255,101,132,0.2); color: var(--secondary); }
-    .blog-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-    .blog-body {
-      padding: 1rem 1.8rem 1.5rem;
-    }
-    .blog-excerpt {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 1.2rem;
-    }
-    .blog-read-more {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--primary);
-      transition: var(--transition);
-    }
-    .blog-read-more:hover { gap: 0.7rem; }
-    .blog-read-more svg { transition: var(--transition); }
-    .blog-coming-soon {
-      text-align: center;
-      padding: 4rem 2rem;
-      background: var(--card-bg);
-      border: 1px dashed var(--card-border);
-      border-radius: var(--radius);
-      color: var(--text-muted);
-    }
-    .blog-coming-soon .emoji { font-size: 3rem; display: block; margin-bottom: 1rem; }
-
-    /* ===== Contact ===== */
-    .contact-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-    .contact-text h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    .contact-text p {
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-    .social-links {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .social-link {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.2rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      transition: var(--transition);
-    }
-    .social-link:hover {
-      border-color: var(--primary);
-      transform: translateX(6px);
-      background: rgba(108,99,255,0.08);
-    }
-    .social-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .social-icon.github { background: rgba(255,255,255,0.1); }
-    .social-icon.email { background: rgba(255,101,132,0.2); }
-    .social-info strong { display: block; font-size: 0.95rem; font-weight: 600; }
-    .social-info span { font-size: 0.82rem; color: var(--text-muted); }
-    .contact-form-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      backdrop-filter: blur(20px);
-    }
-    .form-group { margin-bottom: 1.2rem; }
-    .form-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    .form-input, .form-textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: var(--font-main);
-      font-size: 0.95rem;
+    .value-desc { font-size: 0.88rem; color: var(--text-soft); line-height: 1.8; }
+
+    /* ===== Gallery / Works ===== */
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .work-card {
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
       transition: var(--transition);
-      outline: none;
+      border: 1.5px solid rgba(232,133,154,0.12);
     }
-    .form-input:focus, .form-textarea:focus {
-      border-color: var(--primary);
-      background: rgba(108,99,255,0.05);
-      box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+    .work-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow);
     }
-    .form-input::placeholder, .form-textarea::placeholder { color: rgba(167,169,190,0.5); }
-    .form-textarea { resize: vertical; min-height: 120px; }
-    .form-submit {
-      width: 100%;
-      padding: 0.85rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-family: var(--font-main);
+    .work-thumb {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .work-thumb.w1 { background: linear-gradient(135deg, rgba(249,192,199,0.4), rgba(253,213,177,0.4)); }
+    .work-thumb.w2 { background: linear-gradient(135deg, rgba(217,199,245,0.4), rgba(249,192,199,0.4)); }
+    .work-thumb.w3 { background: linear-gradient(135deg, rgba(200,240,224,0.4), rgba(217,199,245,0.4)); }
+    .work-thumb.w4 { background: linear-gradient(135deg, rgba(253,213,177,0.4), rgba(245,200,66,0.2)); }
+    .work-body { padding: 1.4rem; }
+    .work-category {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+    .work-title {
+      font-family: var(--font-serif);
       font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+    .work-desc { font-size: 0.85rem; color: var(--text-soft); line-height: 1.7; }
+    .work-coming {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: var(--rose);
       font-weight: 600;
-      cursor: pointer;
+    }
+
+    /* ===== Links / Find me ===== */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+    .link-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.2rem 1.5rem;
+      background: white;
+      border-radius: var(--radius);
+      border: 1.5px solid rgba(232,133,154,0.15);
+      box-shadow: var(--shadow-sm);
       transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(108,99,255,0.3);
     }
-    .form-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(108,99,255,0.5);
+    .link-card:hover {
+      transform: translateX(6px);
+      border-color: rgba(232,133,154,0.5);
+      box-shadow: var(--shadow);
     }
+    .link-icon {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .link-icon.github { background: rgba(249,192,199,0.3); }
+    .link-icon.email  { background: rgba(217,199,245,0.3); }
+    .link-icon.insta  { background: rgba(253,213,177,0.4); }
+    .link-info strong { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+    .link-info span   { font-size: 0.8rem; color: var(--text-soft); }
+
+    /* ===== CTA banner ===== */
+    .cta-banner {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 4rem 3rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid rgba(232,133,154,0.2);
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(249,192,199,0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(217,199,245,0.2) 0%, transparent 50%);
+    }
+    .cta-banner > * { position: relative; }
+    .cta-emoji { font-size: 3.5rem; display: block; margin-bottom: 1.2rem; animation: float 5s ease-in-out infinite; }
+    .cta-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .cta-desc { font-size: 1rem; color: var(--text-mid); max-width: 480px; margin: 0 auto 2rem; line-height: 1.9; }
 
     /* ===== Footer ===== */
     footer {
-      border-top: 1px solid var(--card-border);
+      border-top: 1px solid rgba(232,133,154,0.15);
       padding: 2rem;
       text-align: center;
-      color: var(--text-muted);
-      font-size: 0.88rem;
     }
     .footer-inner {
       max-width: 1100px;
@@ -704,353 +667,276 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
-    .footer-logo {
-      font-family: var(--font-code);
+    .footer-brand {
+      font-family: var(--font-serif);
       font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 1rem;
+      color: var(--deep-rose);
+      letter-spacing: 0.1em;
     }
+    .footer-copy { font-size: 0.82rem; color: var(--text-soft); }
     .footer-links { display: flex; gap: 1.5rem; }
-    .footer-links a { color: var(--text-muted); transition: var(--transition); font-size: 0.88rem; }
-    .footer-links a:hover { color: var(--primary); }
+    .footer-links a { font-size: 0.82rem; color: var(--text-soft); transition: var(--transition); }
+    .footer-links a:hover { color: var(--deep-rose); }
 
-    /* ===== Divider ===== */
-    .section-divider {
-      max-width: 1100px;
-      margin: 0 auto;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--card-border), transparent);
-    }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      nav { padding: 1rem; }
-      .nav-links { display: none; }
-      .hero { padding: 7rem 1.5rem 3rem; }
-      section { padding: 4rem 1.5rem; }
-      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .contact-wrapper { grid-template-columns: 1fr; gap: 2rem; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .blog-grid { grid-template-columns: 1fr; }
-      .footer-inner { flex-direction: column; text-align: center; }
-    }
-
-    /* ===== Fade In Animation ===== */
-    .fade-in {
+    /* ===== Fade animations ===== */
+    .fade-up {
       opacity: 0;
       transform: translateY(30px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
 
-    /* ===== Gradient text utility ===== */
-    .gradient-text {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .gradient-text-green {
-      background: linear-gradient(135deg, var(--accent), #00cec9);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* ===== Highlight bar ===== */
-    .highlight-bar {
-      display: inline;
-      position: relative;
-    }
-    .highlight-bar::after {
-      content: '';
-      position: absolute;
-      bottom: 2px; left: 0;
-      width: 100%; height: 8px;
-      background: linear-gradient(90deg, rgba(108,99,255,0.4), rgba(255,101,132,0.4));
-      z-index: -1;
-      border-radius: 4px;
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 7rem 1.5rem 4rem; }
+      .section { padding: 4rem 1.5rem; }
+      .concept-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .values-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .hero-deco { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Animated Background -->
-  <div class="bg-canvas">
-    <div class="orb3"></div>
-  </div>
+  <!-- Background -->
+  <div class="bg-layer"></div>
+  <div class="petals-container" id="petalsContainer"></div>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="#" class="nav-logo">&lt;taiyu /&gt;</a>
+  <!-- Nav -->
+  <nav id="mainNav">
+    <div class="nav-brand">
+      <span class="en">Taicosmia</span>
+      <span class="zh">✦ 星語蝶花 ✦</span>
+    </div>
     <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#blog">Blog</a></li>
-      <li><a href="#contact" class="nav-cta">Contact</a></li>
+      <li><a href="#concept">品牌故事</a></li>
+      <li><a href="#works">創作</a></li>
+      <li><a href="#connect">找到我</a></li>
+      <li><a href="https://github.com/Taicosmia" target="_blank" class="nav-cta">GitHub ✦</a></li>
     </ul>
   </nav>
 
   <!-- Hero -->
   <section class="hero" id="home">
+    <span class="hero-deco hero-deco-tl">🦋</span>
+    <span class="hero-deco hero-deco-tr">🌸</span>
+    <span class="hero-deco hero-deco-bl">🌷</span>
+    <span class="hero-deco hero-deco-br">✨</span>
+
     <div class="hero-inner">
       <div class="hero-badge">
-        <span class="dot"></span>
-        Available for opportunities
+        <span class="butterfly">🦋</span>
+        每一個心意，都好好送到你手上
       </div>
+      <p class="hero-eyebrow">Welcome to</p>
       <h1 class="hero-title">
-        <span class="name">Taiyu Chen</span>
-        <span class="role">Full-Stack Developer</span>
+        <span class="shimmer">Taicosmia</span>
       </h1>
-      <p class="hero-desc">
-        熱愛打造充滿創意的數位體驗。從前端到後端，用程式碼把想法變成現實。
-        <br/>Building creative digital experiences — from frontend to backend.
+      <p class="hero-subtitle-zh">星　語　蝶　花</p>
+      <div class="hero-divider">
+        <span></span>
+        <span class="icon">🌸</span>
+        <span></span>
+      </div>
+      <p class="hero-tagline">
+        在宇宙的某個角落，有蝴蝶與花朵低語。<br/>
+        <em>Somewhere in the cosmos, butterflies and flowers whisper.</em>
       </p>
       <div class="hero-actions">
-        <a href="#projects" class="btn-primary">View Projects ✦</a>
-        <a href="#contact" class="btn-outline">Get In Touch</a>
-      </div>
-    </div>
-    <div class="hero-scroll">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
-      </svg>
-      scroll
-    </div>
-  </section>
-
-  <div class="section-divider"></div>
-
-  <!-- About -->
-  <section id="about">
-    <div class="section-tag">ABOUT ME</div>
-    <h2 class="section-title">Passionate about<br/><span class="gradient-text">building things</span></h2>
-    <p class="section-desc">A developer who loves turning ideas into elegant, functional products.</p>
-
-    <div class="about-grid fade-in">
-      <div class="about-text">
-        <p>
-          Hi! I'm <strong>Taiyu</strong>, a Full-Stack Developer based in Taiwan.
-          I'm passionate about creating web applications that are both technically solid and visually delightful.
-        </p>
-        <p>
-          I enjoy working across the stack — from crafting pixel-perfect UIs to designing scalable backend systems.
-          When I'm not coding, you'll find me exploring new technologies, contributing to open source, or writing about my learnings.
-        </p>
-        <p>
-          I believe great software is the intersection of <strong>good engineering</strong> and <strong>thoughtful design</strong>.
-        </p>
-
-        <div class="skills-title">Technologies I work with</div>
-        <div class="skills-grid">
-          <span class="skill-tag highlight">JavaScript</span>
-          <span class="skill-tag highlight">TypeScript</span>
-          <span class="skill-tag highlight">React</span>
-          <span class="skill-tag highlight">Vue.js</span>
-          <span class="skill-tag">Node.js</span>
-          <span class="skill-tag">Python</span>
-          <span class="skill-tag">Docker</span>
-          <span class="skill-tag">Git</span>
-          <span class="skill-tag">PostgreSQL</span>
-          <span class="skill-tag">REST API</span>
-          <span class="skill-tag">HTML/CSS</span>
-          <span class="skill-tag">Linux</span>
-        </div>
-      </div>
-
-      <div class="about-visual">
-        <div class="about-card">
-          <div class="stat-item">
-            <div class="stat-label">GitHub Projects</div>
-            <div class="stat-value">∞</div>
-            <div class="stat-sub">Always building something new</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-label">Coffee per day</div>
-            <div class="stat-value">2+</div>
-            <div class="stat-sub">Fuel for creativity ☕</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-label">Current focus</div>
-            <div class="stat-value" style="font-size:1.2rem;">Full-Stack</div>
-            <div class="stat-sub">Web · Mobile · Cloud</div>
-          </div>
-        </div>
+        <a href="#concept" class="btn-rose">探索品牌故事 🦋</a>
+        <a href="https://github.com/Taicosmia" target="_blank" class="btn-ghost">GitHub ✦</a>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <div class="divider-flower">
+    <span class="icon">🌸</span>
+    <span class="icon">🦋</span>
+    <span class="icon">🌼</span>
+  </div>
 
-  <!-- Projects -->
-  <section id="projects">
-    <div class="section-tag">PROJECTS</div>
-    <h2 class="section-title">Things I've <span class="gradient-text">built</span></h2>
-    <p class="section-desc">A selection of projects I've worked on. Each one taught me something new.</p>
+  <!-- Brand Concept -->
+  <section class="section" id="concept">
+    <div class="section-tag"><span class="flower">🌷</span> Brand Story</div>
+    <h2 class="section-title">關於 <span class="accent">星語蝶花</span></h2>
+    <p class="section-desc">一個關於傳遞心意的品牌故事。</p>
 
-    <div class="projects-grid fade-in">
-
-      <!-- Project 1 -->
-      <div class="project-card">
-        <div class="project-icon purple">🫀</div>
-        <div class="project-name">BioDigital Heart Viewer</div>
-        <div class="project-desc">
-          Interactive 3D cardiac anatomy visualization using BioDigital Human API.
-          Embedded real-time 3D heart model with atrial fibrillation conduction system display.
-        </div>
-        <div class="project-tags">
-          <span class="project-tag">HTML</span>
-          <span class="project-tag">BioDigital API</span>
-          <span class="project-tag">3D</span>
-        </div>
-        <div class="project-links">
-          <a href="https://github.com/taiyu-twn" target="_blank" class="project-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-            </svg>
-            Source
-          </a>
+    <div class="concept-grid">
+      <div class="concept-visual fade-up">
+        <div class="concept-card">
+          <div class="float-deco float-deco-1">🦋</div>
+          <div class="float-deco float-deco-2">🌸</div>
+          <div class="float-deco float-deco-3">⭐</div>
+          <span class="concept-big-emoji">🦋</span>
+          <div class="concept-card-title">星語蝶花</div>
+          <div class="concept-card-sub">Taicosmia · Star · Butterfly · Flower</div>
+          <div class="concept-tags">
+            <span class="concept-tag blush">溫暖</span>
+            <span class="concept-tag lavender">創意</span>
+            <span class="concept-tag mint">真誠</span>
+            <span class="concept-tag honey">用心</span>
+          </div>
         </div>
       </div>
 
-      <!-- Project 2 -->
-      <div class="project-card">
-        <div class="project-icon pink">🌐</div>
-        <div class="project-name">Personal Website</div>
-        <div class="project-desc">
-          This website you're looking at! Built with pure HTML, CSS, and vanilla JavaScript.
-          Featuring animated backgrounds, glassmorphism cards, and responsive design.
-        </div>
-        <div class="project-tags">
-          <span class="project-tag">HTML</span>
-          <span class="project-tag">CSS</span>
-          <span class="project-tag">JavaScript</span>
-          <span class="project-tag">GitHub Pages</span>
-        </div>
-        <div class="project-links">
-          <a href="https://github.com/taiyu-twn/taiyu-twn.github.io" target="_blank" class="project-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-            </svg>
-            Source
-          </a>
-          <a href="#" class="project-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
-            </svg>
-            Live
-          </a>
-        </div>
-      </div>
-
-      <!-- Project 3 - Placeholder -->
-      <div class="project-card">
-        <div class="project-icon green">🚀</div>
-        <div class="project-name">Next Project</div>
-        <div class="project-desc">
-          Something exciting is in the works! Stay tuned for the next project.
-          Follow my GitHub to be the first to know when it's ready.
-        </div>
-        <div class="project-tags">
-          <span class="project-tag">Coming Soon</span>
-        </div>
-        <div class="project-links">
-          <a href="https://github.com/taiyu-twn" target="_blank" class="project-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-            </svg>
-            Follow on GitHub
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <div class="section-divider"></div>
-
-  <!-- Blog -->
-  <section id="blog">
-    <div class="section-tag">BLOG</div>
-    <h2 class="section-title">Thoughts &amp; <span class="gradient-text-green">writings</span></h2>
-    <p class="section-desc">Sharing what I learn along the way — technical deep-dives, tips, and personal reflections.</p>
-
-    <div class="blog-coming-soon fade-in">
-      <span class="emoji">✍️</span>
-      <h3 style="font-size:1.3rem; font-weight:700; margin-bottom:0.75rem;">Blog coming soon!</h3>
-      <p style="color:var(--text-muted); max-width:400px; margin:0 auto; line-height:1.8;">
-        I'm working on putting together some articles. Check back soon, or follow my
-        <a href="https://github.com/taiyu-twn" target="_blank" style="color:var(--primary)">GitHub</a>
-        for updates.
-      </p>
-    </div>
-  </section>
-
-  <div class="section-divider"></div>
-
-  <!-- Contact -->
-  <section id="contact">
-    <div class="section-tag">CONTACT</div>
-    <h2 class="section-title">Let's <span class="gradient-text">work together</span></h2>
-    <p class="section-desc">Have a project in mind? Want to collaborate? Or just want to say hi? I'd love to hear from you.</p>
-
-    <div class="contact-wrapper fade-in">
-      <div class="contact-text">
-        <h3>Get in touch</h3>
+      <div class="concept-text fade-up delay-1">
         <p>
-          Whether it's a full-time role, a freelance project, or a quick question,
-          feel free to reach out. I'll get back to you as soon as possible!
+          <strong>Taicosmia</strong> 源自「宇宙」（cosmos）——
+          就像宇宙中每一顆星都有它的位置，
+          每一份心意也有它應該抵達的地方。
         </p>
-        <div class="social-links">
-          <a href="https://github.com/taiyu-twn" target="_blank" class="social-link">
-            <div class="social-icon github">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
-              </svg>
-            </div>
-            <div class="social-info">
-              <strong>GitHub</strong>
-              <span>github.com/taiyu-twn</span>
-            </div>
-          </a>
-          <a href="mailto:taiyu.twn@gmail.com" class="social-link">
-            <div class="social-icon email">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-              </svg>
-            </div>
-            <div class="social-info">
-              <strong>Email</strong>
-              <span>taiyu.twn@gmail.com</span>
-            </div>
-          </a>
+        <p>
+          <strong>星語蝶花</strong> 是這個品牌的靈魂：
+          星星低語著秘密，蝴蝶承載著思念，
+          花朵盛開時訴說著愛與溫柔。
+        </p>
+        <div class="concept-quote">
+          <p>「每一個心意，都好好送到對方手上。」<br/>
+          Every feeling, carefully delivered to you.</p>
+        </div>
+        <p>
+          我們相信，<strong>創作是傳遞心意最美的方式</strong>。
+          無論是一張插圖、一個設計、還是一段文字，
+          都是蝴蝶振翅的瞬間——輕盈而真實。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-flower">
+    <span class="icon">✨</span>
+    <span class="icon">🌸</span>
+    <span class="icon">✨</span>
+  </div>
+
+  <!-- Values -->
+  <section class="section" id="values">
+    <div class="section-tag"><span class="flower">🌼</span> Core Values</div>
+    <h2 class="section-title">品牌<span class="accent">核心理念</span></h2>
+    <p class="section-desc">每一個創作背後，都有這三個信念在守護。</p>
+
+    <div class="values-grid">
+      <div class="value-card v1 fade-up">
+        <span class="value-emoji">🌸</span>
+        <div class="value-title">溫暖傳遞</div>
+        <div class="value-desc">每一份心意都值得被好好對待。我們用最溫柔的方式，讓感情跨越距離，抵達彼此心中。</div>
+      </div>
+      <div class="value-card v2 fade-up delay-1">
+        <span class="value-emoji">🦋</span>
+        <div class="value-title">自由創作</div>
+        <div class="value-desc">像蝴蝶在花間飛舞，創意不設邊界。我們在每一個作品中，放入最純粹的靈感與熱情。</div>
+      </div>
+      <div class="value-card v3 fade-up delay-2">
+        <span class="value-emoji">⭐</span>
+        <div class="value-title">星語真誠</div>
+        <div class="value-desc">用星星的方式低語——真實、閃亮、長久。每一個細節都是對你的誠摯承諾。</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-flower">
+    <span class="icon">🦋</span>
+    <span class="icon">🌷</span>
+    <span class="icon">🦋</span>
+  </div>
+
+  <!-- Works -->
+  <section class="section" id="works">
+    <div class="section-tag"><span class="flower">🎨</span> Creative Works</div>
+    <h2 class="section-title">創作<span class="accent">作品</span></h2>
+    <p class="section-desc">蝴蝶與花朵的故事，正在一頁一頁展開……</p>
+
+    <div class="works-grid">
+      <div class="work-card fade-up">
+        <div class="work-thumb w1">🦋</div>
+        <div class="work-body">
+          <div class="work-category">Illustration · 插圖</div>
+          <div class="work-title">蝶舞系列</div>
+          <div class="work-desc">以蝴蝶為主角的一系列插圖，每隻蝴蝶都承載著一個獨特的心情故事。</div>
+          <div class="work-coming">✦ Coming Soon</div>
         </div>
       </div>
+      <div class="work-card fade-up delay-1">
+        <div class="work-thumb w2">🌸</div>
+        <div class="work-body">
+          <div class="work-category">Design · 設計</div>
+          <div class="work-title">花語明信片</div>
+          <div class="work-desc">用花語訴說心意的手作明信片，讓每一朵花都成為送給你的祝福。</div>
+          <div class="work-coming">✦ Coming Soon</div>
+        </div>
+      </div>
+      <div class="work-card fade-up delay-2">
+        <div class="work-thumb w3">⭐</div>
+        <div class="work-body">
+          <div class="work-category">Story · 故事</div>
+          <div class="work-title">星語小說</div>
+          <div class="work-desc">在宇宙與花田之間，一段關於心意與相遇的溫柔故事。</div>
+          <div class="work-coming">✦ Coming Soon</div>
+        </div>
+      </div>
+      <div class="work-card fade-up delay-3">
+        <div class="work-thumb w4">🎁</div>
+        <div class="work-body">
+          <div class="work-category">Gift · 禮物</div>
+          <div class="work-title">心意禮盒</div>
+          <div class="work-desc">精心策劃的禮物組合，把溫暖和祝福一起包進去，送到最重要的人手中。</div>
+          <div class="work-coming">✦ Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <div class="contact-form-card">
-        <form onsubmit="handleSubmit(event)">
-          <div class="form-group">
-            <label class="form-label">Name</label>
-            <input type="text" class="form-input" placeholder="Your name" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-input" placeholder="your@email.com" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Message</label>
-            <textarea class="form-textarea" placeholder="Tell me about your project or just say hi!" required></textarea>
-          </div>
-          <button type="submit" class="form-submit">Send Message ✉️</button>
-        </form>
+  <div class="divider-flower">
+    <span class="icon">🌸</span>
+    <span class="icon">✨</span>
+    <span class="icon">🌸</span>
+  </div>
+
+  <!-- Connect -->
+  <section class="section" id="connect">
+    <div class="section-tag"><span class="flower">💌</span> Find Me</div>
+    <h2 class="section-title">找到<span class="accent">我們</span></h2>
+    <p class="section-desc">來和我們說說你的心意，一起把美好的事情送出去。</p>
+
+    <div class="links-grid fade-up">
+      <a href="https://github.com/Taicosmia" target="_blank" class="link-card">
+        <div class="link-icon github">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#c4617a">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </div>
+        <div class="link-info">
+          <strong>GitHub</strong>
+          <span>github.com/Taicosmia</span>
+        </div>
+      </a>
+
+      <a href="mailto:taiyu.twn@gmail.com" class="link-card">
+        <div class="link-icon email">🌷</div>
+        <div class="link-info">
+          <strong>Email</strong>
+          <span>taiyu.twn@gmail.com</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- CTA -->
+    <div style="margin-top: 3rem;">
+      <div class="cta-banner fade-up">
+        <span class="cta-emoji">🦋</span>
+        <h3 class="cta-title">有想法想分享嗎？</h3>
+        <p class="cta-desc">
+          無論是合作提案、創作交流，還是只是想說聲你好——<br/>
+          蝴蝶的翅膀隨時準備好，替你把心意送出去。
+        </p>
+        <a href="mailto:taiyu.twn@gmail.com" class="btn-rose">送出心意 💌</a>
       </div>
     </div>
   </section>
@@ -1058,66 +944,52 @@
   <!-- Footer -->
   <footer>
     <div class="footer-inner">
-      <span class="footer-logo">&lt;taiyu /&gt;</span>
-      <span>Designed &amp; Built by Taiyu Chen · 2025</span>
+      <span class="footer-brand">Taicosmia ✦ 星語蝶花</span>
+      <span class="footer-copy">© 2025 Taicosmia · Every feeling, carefully delivered 🦋</span>
       <div class="footer-links">
         <a href="#home">Top</a>
-        <a href="https://github.com/taiyu-twn" target="_blank">GitHub</a>
+        <a href="https://github.com/Taicosmia" target="_blank">GitHub</a>
         <a href="mailto:taiyu.twn@gmail.com">Email</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // ===== Fade-in on scroll =====
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
+    // ===== Falling petals =====
+    const container = document.getElementById('petalsContainer');
+    const petalEmojis = ['🌸', '🌺', '🌼', '🌷', '✿', '❀'];
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-    // ===== Contact Form =====
-    function handleSubmit(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('.form-submit');
-      btn.textContent = '✓ Message sent!';
-      btn.style.background = 'linear-gradient(135deg, #43e97b, #38f9d7)';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.textContent = 'Send Message ✉️';
-        btn.style.background = '';
-        btn.disabled = false;
-        e.target.reset();
-      }, 3000);
+    function createPetal() {
+      const el = document.createElement('span');
+      el.className = 'petal';
+      el.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+      el.style.cssText = `
+        left: ${Math.random() * 100}%;
+        font-size: ${0.7 + Math.random() * 1.2}rem;
+        animation-duration: ${8 + Math.random() * 10}s;
+        animation-delay: ${Math.random() * 8}s;
+      `;
+      container.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
     }
 
-    // ===== Nav scroll effect =====
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('nav');
-      if (window.scrollY > 50) {
-        nav.style.background = 'rgba(15,14,23,0.95)';
-      } else {
-        nav.style.background = 'rgba(15,14,23,0.8)';
-      }
-    });
+    // Initial petals
+    for (let i = 0; i < 12; i++) setTimeout(createPetal, i * 600);
+    // Continuous petals
+    setInterval(createPetal, 1800);
 
-    // ===== Smooth active nav =====
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    // ===== Scroll fade-in =====
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // ===== Nav scroll =====
     window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(s => {
-        if (window.scrollY >= s.offsetTop - 200) current = s.id;
-      });
-      navLinks.forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + current
-          ? 'var(--text)'
-          : 'var(--text-muted)';
-      });
+      const nav = document.getElementById('mainNav');
+      nav.style.boxShadow = window.scrollY > 40
+        ? '0 4px 20px rgba(196,97,122,0.1)'
+        : 'none';
     });
   </script>
 </body>
