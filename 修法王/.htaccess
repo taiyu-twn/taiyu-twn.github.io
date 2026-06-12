@@ -1,0 +1,13 @@
+Options -Indexes
+
+# 保護設定檔
+<Files "credentials.json">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# 防止直接存取 lib/ config/ admin/_layout.php
+<FilesMatch "^_">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
