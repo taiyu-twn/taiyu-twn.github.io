@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone       = trim($_POST['phone'] ?? '');
     $email       = trim($_POST['email'] ?? '');
     $videoUrl    = trim($_POST['video_url'] ?? '');
+    $igUrl       = trim($_POST['ig_url'] ?? '');
     $platformId  = trim(strip_tags($_POST['platform_id'] ?? ''));
     $category    = trim($_POST['category'] ?? '');
     $school      = trim(strip_tags($_POST['school'] ?? ''));
@@ -43,6 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!preg_match('/^https:\/\/(www\.)?youtube\.com\/(shorts\/|watch\?v=)[\w\-]+/', $videoUrl) &&
         !preg_match('/^https:\/\/youtu\.be\/[\w\-]+/', $videoUrl)) {
         $errors['video_url'] = '請輸入有效的 YouTube 網址';
+    }
+    if (!empty($igUrl) && !preg_match('/^https:\/\/(www\.)?instagram\.com\/(p|reel|tv)\/[\w\-]+/', $igUrl)) {
+        $errors['ig_url'] = '請輸入有效的 Instagram 貼文或 Reels 網址';
     }
     if (!in_array($category, ['general', 'streamer', 'student'])) {
         $errors['category'] = '請選擇參賽身分';
@@ -104,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $phone,
             $email,
             $videoUrl,
+            $igUrl,
             $platformId,
             $category,
             $idPhotoPath,
@@ -185,6 +190,14 @@ pageHeader('我要報名');
                value="<?= htmlspecialchars($_POST['video_url'] ?? '', ENT_QUOTES) ?>" required>
         <?php if (!empty($errors['video_url'])): ?><div class="error"><?= $errors['video_url'] ?></div><?php endif ?>
         <div class="error" id="urlError"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Instagram 貼文／Reels 網址（選填）</label>
+        <input type="url" name="ig_url" placeholder="https://www.instagram.com/reel/..."
+               value="<?= htmlspecialchars($_POST['ig_url'] ?? '', ENT_QUOTES) ?>">
+        <small style="color:#666">填寫後，投票頁會顯示「前往 Instagram 觀看」按鈕</small>
+        <?php if (!empty($errors['ig_url'])): ?><div class="error"><?= $errors['ig_url'] ?></div><?php endif ?>
       </div>
 
       <div class="form-group">
@@ -270,6 +283,29 @@ urlInput?.addEventListener('input', () => {
   const ok = /^https:\/\/(www\.)?youtube\.com\/(shorts\/|watch\?v=)[\w\-]+/.test(v) ||
              /^https:\/\/youtu\.be\/[\w\-]+/.test(v);
   document.getElementById('urlError').textContent = (v && !ok) ? 'YouTube 網址格式不正確' : '';
+  // 即時驗證後顯示縮圖預覽
+  if (ok) {
+    const m = v.match(/(?:shorts\/|v=|youtu\.be\/)([a-zA-Z0-9_\-]+)/);
+    if (m) {
+      let prev = document.getElementById('ytPreview');
+      if (!prev) {
+        prev = document.createElement('img');
+        prev.id = 'ytPreview';
+        prev.style.cssText = 'width:200px;border-radius:6px;margin-top:.5rem;display:block';
+        urlInput.parentNode.appendChild(prev);
+      }
+      prev.src = `https://img.youtube.com/vi/${m[1]}/mqdefault.jpg`;
+    }
+  } else {
+    document.getElementById('ytPreview')?.remove();
+  }
+});
+
+// IG 網址驗證
+document.querySelector('input[name=ig_url]')?.addEventListener('input', function() {
+  const v = this.value.trim();
+  const igOk = !v || /^https:\/\/(www\.)?instagram\.com\/(p|reel|tv)\/[\w\-]+/.test(v);
+  this.style.borderColor = (v && !igOk) ? '#e74c3c' : '';
 });
 
 // 送出前最後驗證

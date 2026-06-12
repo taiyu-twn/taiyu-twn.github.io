@@ -18,6 +18,7 @@ if (!$video || $video['status'] !== 'approved') {
 }
 
 $votes     = countVotesForVideo($id);
+$igUrl     = $video['ig_url'] ?? '';
 $pageUrl   = SITE_URL . '/public/video.php?id=' . urlencode($id);
 $qrUrl     = 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=' . urlencode($pageUrl);
 $loggedIn  = isLoggedIn();
@@ -52,6 +53,13 @@ pageHeader($video['team_name']);
         <?= ['general'=>'一般大眾','streamer'=>'直播主','student'=>'在校學生'][$video['category']] ?? '' ?>
       </span>
     </div>
+
+    <?php if (!empty($igUrl)): ?>
+    <a href="<?= htmlspecialchars($igUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener"
+       class="btn" style="background:#E1306C;color:#fff;margin-bottom:1rem;display:inline-flex;align-items:center;gap:.4rem">
+      📷 前往 Instagram 觀看
+    </a>
+    <?php endif ?>
 
     <?php if ($loggedIn): ?>
       <button id="voteBtn" class="btn btn-green" style="font-size:1.1rem;padding:.8rem 2rem"
