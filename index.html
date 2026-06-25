@@ -1,996 +1,696 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taicosmia — 星語蝶花</title>
-  <meta name="description" content="Taicosmia 星語蝶花 — 每一個心意，都好好送到你手上。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    /* ===== Variables ===== */
-    :root {
-      --blush:    #f9c0c7;
-      --rose:     #e8859a;
-      --deep-rose:#c4617a;
-      --peach:    #fdd5b1;
-      --warm:     #f9a876;
-      --lavender: #d9c7f5;
-      --violet:   #b39ddb;
-      --soft-yellow: #fef0c7;
-      --honey:    #f5c842;
-      --mint:     #c8f0e0;
-      --cream:    #fef8f2;
-      --petal:    #fff0f5;
-      --text-dark:#4a3040;
-      --text-mid: #7a5566;
-      --text-soft:#a07888;
-      --card-bg:  rgba(255,255,255,0.75);
-      --radius-lg: 24px;
-      --radius:    16px;
-      --radius-sm: 10px;
-      --shadow:    0 8px 40px rgba(196,97,122,0.12);
-      --shadow-sm: 0 4px 20px rgba(196,97,122,0.08);
-      --font-serif: 'Noto Serif TC', 'Lora', serif;
-      --font-body:  'Nunito', 'Noto Serif TC', sans-serif;
-      --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>泰宇減重追蹤系統</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    /* ===== Reset ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font-body);
-      background: var(--cream);
-      color: var(--text-dark);
-      overflow-x: hidden;
-      line-height: 1.7;
-    }
-    a { color: inherit; text-decoration: none; }
-    ul { list-style: none; }
-    img { max-width: 100%; display: block; }
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card2: #21253a;
+    --accent: #4ade80;
+    --accent2: #22d3ee;
+    --warn: #fb923c;
+    --danger: #f87171;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --border: #2d3148;
+  }
 
-    /* ===== Scrollbar ===== */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--petal); }
-    ::-webkit-scrollbar-thumb { background: var(--rose); border-radius: 3px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ===== Floating petals background ===== */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background:
-        radial-gradient(ellipse 80% 60% at 15% 20%, rgba(249,192,199,0.25) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(217,199,245,0.2) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(253,213,177,0.15) 0%, transparent 60%),
-        var(--cream);
-    }
-    .petals-container {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .petal {
-      position: absolute;
-      opacity: 0;
-      animation: fallingPetal linear infinite;
-    }
-    @keyframes fallingPetal {
-      0%   { opacity: 0; transform: translateY(-60px) rotate(0deg) scale(0.8); }
-      10%  { opacity: 0.7; }
-      90%  { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(110vh) rotate(480deg) scale(1.1); }
-    }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
 
-    /* ===== Nav ===== */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 1rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(254,248,242,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(232,133,154,0.15);
-      transition: var(--transition);
-    }
-    .nav-brand {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
-    .nav-brand .en {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--deep-rose);
-      letter-spacing: 0.08em;
-    }
-    .nav-brand .zh {
-      font-size: 0.72rem;
-      color: var(--text-soft);
-      letter-spacing: 0.2em;
-    }
-    .nav-links {
-      display: flex;
-      gap: 2.2rem;
-      align-items: center;
-    }
-    .nav-links a {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-mid);
-      letter-spacing: 0.06em;
-      position: relative;
-      transition: var(--transition);
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px; left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 2px;
-      background: linear-gradient(90deg, var(--rose), var(--violet));
-      border-radius: 2px;
-      transition: var(--transition);
-    }
-    .nav-links a:hover { color: var(--deep-rose); }
-    .nav-links a:hover::after { width: 100%; }
-    .nav-cta {
-      padding: 0.5rem 1.4rem;
-      background: linear-gradient(135deg, var(--rose), var(--violet));
-      border-radius: 50px;
-      color: white !important;
-      font-weight: 700;
-      font-size: 0.88rem;
-      box-shadow: 0 4px 14px rgba(179,157,219,0.35);
-      transition: var(--transition);
-    }
-    .nav-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(179,157,219,0.5);
-    }
-    .nav-cta::after { display: none !important; }
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
 
-    /* ===== Hero ===== */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8rem 2rem 5rem;
-      position: relative;
-    }
-    .hero-inner {
-      max-width: 780px;
-      width: 100%;
-      text-align: center;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.45rem 1.2rem;
-      background: white;
-      border: 1.5px solid rgba(232,133,154,0.3);
-      border-radius: 50px;
-      font-size: 0.82rem;
-      color: var(--text-soft);
-      letter-spacing: 0.12em;
-      margin-bottom: 2.5rem;
-      box-shadow: var(--shadow-sm);
-    }
-    .hero-badge .butterfly { font-size: 1rem; }
-    .hero-eyebrow {
-      font-size: 0.8rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      margin-bottom: 1rem;
-    }
-    .hero-title {
-      font-family: var(--font-serif);
-      font-size: clamp(3.5rem, 10vw, 7rem);
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: 0.04em;
-      color: var(--deep-rose);
-      margin-bottom: 0.6rem;
-      position: relative;
-    }
-    .hero-title .shimmer {
-      background: linear-gradient(
-        120deg,
-        var(--deep-rose) 0%,
-        var(--rose) 30%,
-        var(--violet) 60%,
-        var(--deep-rose) 100%
-      );
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmerText 4s linear infinite;
-    }
-    @keyframes shimmerText {
-      0%   { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
-    .hero-subtitle-zh {
-      font-family: var(--font-serif);
-      font-size: clamp(1.4rem, 4vw, 2rem);
-      font-weight: 400;
-      color: var(--rose);
-      letter-spacing: 0.3em;
-      margin-bottom: 1.8rem;
-    }
-    .hero-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.8rem;
-      margin-bottom: 1.8rem;
-    }
-    .hero-divider span {
-      width: 40px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--rose));
-    }
-    .hero-divider span:last-child {
-      background: linear-gradient(90deg, var(--rose), transparent);
-    }
-    .hero-tagline {
-      font-size: 1.1rem;
-      color: var(--text-mid);
-      line-height: 2;
-      margin-bottom: 3rem;
-    }
-    .hero-tagline em {
-      font-style: italic;
-      color: var(--deep-rose);
-      font-family: var(--font-serif);
-    }
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn-rose {
-      padding: 0.9rem 2.4rem;
-      background: linear-gradient(135deg, var(--rose), var(--deep-rose));
-      border-radius: 50px;
-      color: white;
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.05em;
-      box-shadow: 0 6px 24px rgba(196,97,122,0.35);
-      transition: var(--transition);
-    }
-    .btn-rose:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 32px rgba(196,97,122,0.5);
-    }
-    .btn-ghost {
-      padding: 0.9rem 2.4rem;
-      background: white;
-      border: 2px solid rgba(232,133,154,0.35);
-      border-radius: 50px;
-      color: var(--text-mid);
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.05em;
-      transition: var(--transition);
-    }
-    .btn-ghost:hover {
-      border-color: var(--rose);
-      color: var(--deep-rose);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(196,97,122,0.15);
-    }
-    .hero-deco {
-      position: absolute;
-      pointer-events: none;
-      user-select: none;
-    }
-    .hero-deco-tl {
-      top: 120px; left: 5%;
-      font-size: 4rem;
-      opacity: 0.15;
-      animation: float 6s ease-in-out infinite;
-    }
-    .hero-deco-tr {
-      top: 140px; right: 6%;
-      font-size: 3rem;
-      opacity: 0.15;
-      animation: float 7s ease-in-out infinite 1s;
-    }
-    .hero-deco-bl {
-      bottom: 100px; left: 8%;
-      font-size: 2.5rem;
-      opacity: 0.15;
-      animation: float 8s ease-in-out infinite 0.5s;
-    }
-    .hero-deco-br {
-      bottom: 120px; right: 7%;
-      font-size: 3.5rem;
-      opacity: 0.15;
-      animation: float 6s ease-in-out infinite 2s;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-18px) rotate(8deg); }
-    }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
 
-    /* ===== Sections ===== */
-    .section {
-      padding: 6rem 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .section-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      margin-bottom: 0.8rem;
-    }
-    .section-tag .flower { font-size: 0.9rem; }
-    .section-title {
-      font-family: var(--font-serif);
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700;
-      color: var(--text-dark);
-      line-height: 1.3;
-      margin-bottom: 1rem;
-    }
-    .section-title .accent {
-      color: var(--deep-rose);
-    }
-    .section-desc {
-      font-size: 1rem;
-      color: var(--text-mid);
-      max-width: 560px;
-      line-height: 1.9;
-      margin-bottom: 3.5rem;
-    }
-    .divider-flower {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 2rem 0;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .divider-flower::before,
-    .divider-flower::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(232,133,154,0.3), transparent);
-    }
-    .divider-flower .icon { font-size: 1.2rem; opacity: 0.6; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
 
-    /* ===== Concept / Brand Story ===== */
-    .concept-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-    .concept-visual {
-      position: relative;
-    }
-    .concept-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 3rem 2.5rem;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-    }
-    .concept-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--blush), var(--rose), var(--violet), var(--mint));
-    }
-    .concept-big-emoji {
-      font-size: 5rem;
-      display: block;
-      margin-bottom: 1.5rem;
-      animation: float 5s ease-in-out infinite;
-    }
-    .concept-card-title {
-      font-family: var(--font-serif);
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--deep-rose);
-      letter-spacing: 0.2em;
-      margin-bottom: 0.8rem;
-    }
-    .concept-card-sub {
-      font-size: 0.85rem;
-      color: var(--text-soft);
-      letter-spacing: 0.15em;
-    }
-    .concept-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      justify-content: center;
-      margin-top: 1.8rem;
-    }
-    .concept-tag {
-      padding: 0.3rem 0.9rem;
-      border-radius: 50px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-    .concept-tag.blush { background: rgba(249,192,199,0.3); color: var(--deep-rose); border: 1px solid rgba(249,192,199,0.6); }
-    .concept-tag.lavender { background: rgba(217,199,245,0.3); color: #7c5ccc; border: 1px solid rgba(217,199,245,0.6); }
-    .concept-tag.mint { background: rgba(200,240,224,0.3); color: #3a9a72; border: 1px solid rgba(200,240,224,0.6); }
-    .concept-tag.honey { background: rgba(245,200,66,0.2); color: #9a7a0a; border: 1px solid rgba(245,200,66,0.4); }
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
 
-    /* decorative floating elements */
-    .float-deco {
-      position: absolute;
-      pointer-events: none;
-      animation: float 6s ease-in-out infinite;
-    }
-    .float-deco-1 { top: -18px; right: -10px; font-size: 2.5rem; opacity: 0.4; animation-delay: 0s; }
-    .float-deco-2 { bottom: -12px; left: -10px; font-size: 2rem; opacity: 0.35; animation-delay: 1.5s; }
-    .float-deco-3 { top: 30%; right: -20px; font-size: 1.5rem; opacity: 0.3; animation-delay: 3s; }
+  .weight-display {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
 
-    .concept-text p {
-      color: var(--text-mid);
-      line-height: 2;
-      margin-bottom: 1.2rem;
-      font-size: 1rem;
-    }
-    .concept-text p strong {
-      color: var(--deep-rose);
-      font-weight: 700;
-    }
-    .concept-quote {
-      margin: 2rem 0;
-      padding: 1.2rem 1.6rem;
-      border-left: 3px solid var(--rose);
-      background: rgba(249,192,199,0.1);
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    }
-    .concept-quote p {
-      font-family: var(--font-serif);
-      font-size: 1.05rem;
-      font-style: italic;
-      color: var(--deep-rose);
-      line-height: 1.8;
-      margin: 0;
-    }
+  .weight-box {
+    flex: 1;
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
 
-    /* ===== Values ===== */
-    .values-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-    .value-card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 2rem 1.6rem;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-      text-align: center;
-      border: 1.5px solid transparent;
-      position: relative;
-      overflow: hidden;
-    }
-    .value-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      opacity: 0;
-      transition: var(--transition);
-    }
-    .value-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow);
-    }
-    .value-card:hover::after { opacity: 1; }
-    .value-card.v1 { border-color: rgba(249,192,199,0.4); }
-    .value-card.v1::after { background: linear-gradient(90deg, var(--blush), var(--rose)); }
-    .value-card.v2 { border-color: rgba(217,199,245,0.4); }
-    .value-card.v2::after { background: linear-gradient(90deg, var(--lavender), var(--violet)); }
-    .value-card.v3 { border-color: rgba(200,240,224,0.4); }
-    .value-card.v3::after { background: linear-gradient(90deg, var(--mint), #3a9a72); }
-    .value-emoji { font-size: 2.8rem; display: block; margin-bottom: 1rem; }
-    .value-title {
-      font-family: var(--font-serif);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.6rem;
-      letter-spacing: 0.05em;
-    }
-    .value-desc { font-size: 0.88rem; color: var(--text-soft); line-height: 1.8; }
+  .weight-box .label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .weight-box .value { font-size: 22px; font-weight: 700; }
+  .weight-box .value.green { color: var(--accent); }
+  .weight-box .value.cyan { color: var(--accent2); }
+  .weight-box .value.warn { color: var(--warn); }
 
-    /* ===== Gallery / Works ===== */
-    .works-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-    .work-card {
-      background: white;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-      border: 1.5px solid rgba(232,133,154,0.12);
-    }
-    .work-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow);
-    }
-    .work-thumb {
-      height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .work-thumb.w1 { background: linear-gradient(135deg, rgba(249,192,199,0.4), rgba(253,213,177,0.4)); }
-    .work-thumb.w2 { background: linear-gradient(135deg, rgba(217,199,245,0.4), rgba(249,192,199,0.4)); }
-    .work-thumb.w3 { background: linear-gradient(135deg, rgba(200,240,224,0.4), rgba(217,199,245,0.4)); }
-    .work-thumb.w4 { background: linear-gradient(135deg, rgba(253,213,177,0.4), rgba(245,200,66,0.2)); }
-    .work-body { padding: 1.4rem; }
-    .work-category {
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      margin-bottom: 0.5rem;
-    }
-    .work-title {
-      font-family: var(--font-serif);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.5rem;
-    }
-    .work-desc { font-size: 0.85rem; color: var(--text-soft); line-height: 1.7; }
-    .work-coming {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-top: 0.8rem;
-      font-size: 0.8rem;
-      color: var(--rose);
-      font-weight: 600;
-    }
+  .progress-bar-wrap {
+    background: var(--card2);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
 
-    /* ===== Links / Find me ===== */
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.2rem;
-    }
-    .link-card {
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-      padding: 1.2rem 1.5rem;
-      background: white;
-      border-radius: var(--radius);
-      border: 1.5px solid rgba(232,133,154,0.15);
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-    }
-    .link-card:hover {
-      transform: translateX(6px);
-      border-color: rgba(232,133,154,0.5);
-      box-shadow: var(--shadow);
-    }
-    .link-icon {
-      width: 46px; height: 46px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-    .link-icon.github { background: rgba(249,192,199,0.3); }
-    .link-icon.email  { background: rgba(217,199,245,0.3); }
-    .link-icon.insta  { background: rgba(253,213,177,0.4); }
-    .link-info strong { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
-    .link-info span   { font-size: 0.8rem; color: var(--text-soft); }
+  .progress-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+  }
 
-    /* ===== CTA banner ===== */
-    .cta-banner {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 4rem 3rem;
-      text-align: center;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      border: 1.5px solid rgba(232,133,154,0.2);
-    }
-    .cta-banner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(249,192,199,0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 50%, rgba(217,199,245,0.2) 0%, transparent 50%);
-    }
-    .cta-banner > * { position: relative; }
-    .cta-emoji { font-size: 3.5rem; display: block; margin-bottom: 1.2rem; animation: float 5s ease-in-out infinite; }
-    .cta-title {
-      font-family: var(--font-serif);
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 0.8rem;
-      letter-spacing: 0.05em;
-    }
-    .cta-desc { font-size: 1rem; color: var(--text-mid); max-width: 480px; margin: 0 auto 2rem; line-height: 1.9; }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
 
-    /* ===== Footer ===== */
-    footer {
-      border-top: 1px solid rgba(232,133,154,0.15);
-      padding: 2rem;
-      text-align: center;
-    }
-    .footer-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .footer-brand {
-      font-family: var(--font-serif);
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--deep-rose);
-      letter-spacing: 0.1em;
-    }
-    .footer-copy { font-size: 0.82rem; color: var(--text-soft); }
-    .footer-links { display: flex; gap: 1.5rem; }
-    .footer-links a { font-size: 0.82rem; color: var(--text-soft); transition: var(--transition); }
-    .footer-links a:hover { color: var(--deep-rose); }
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
 
-    /* ===== Fade animations ===== */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-    .fade-up.delay-1 { transition-delay: 0.1s; }
-    .fade-up.delay-2 { transition-delay: 0.2s; }
-    .fade-up.delay-3 { transition-delay: 0.3s; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
 
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .hero { padding: 7rem 1.5rem 4rem; }
-      .section { padding: 4rem 1.5rem; }
-      .concept-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .values-grid { grid-template-columns: 1fr; }
-      .footer-inner { flex-direction: column; text-align: center; }
-      .hero-deco { display: none; }
-    }
-  </style>
+  .check-item.done { border-color: var(--accent); opacity: 0.6; }
+
+  .check-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .check-item.done .check-icon {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  .check-text { font-size: 14px; flex: 1; }
+  .check-item.done .check-text { text-decoration: line-through; color: var(--muted); }
+
+  .check-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-weight: 600;
+  }
+  .tag-food { background: #14532d; color: var(--accent); }
+  .tag-move { background: #164e63; color: var(--accent2); }
+  .tag-sup  { background: #431407; color: var(--warn); }
+
+  .log-section { display: flex; flex-direction: column; gap: 8px; }
+
+  .log-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+
+  .tab-btn {
+    flex: 1;
+    padding: 7px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+    resize: none;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #000;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .ai-bubble {
+    background: var(--card2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    display: none;
+  }
+
+  .ai-bubble.show { display: block; }
+
+  .typing { display: inline-flex; gap: 4px; align-items: center; }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.15s; }
+  .dot:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .history-list {
+    display: flex; flex-direction: column; gap: 8px;
+    max-height: 300px; overflow-y: auto;
+  }
+
+  .history-item {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .history-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .history-date { font-size: 11px; color: var(--muted); }
+  .history-content { color: var(--text); line-height: 1.5; }
+  .history-ai { color: var(--accent); font-size: 12px; margin-top: 6px; }
+
+  .weight-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  input[type="number"] {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 16px;
+    padding: 10px 14px;
+    outline: none;
+  }
+
+  input[type="number"]:focus { border-color: var(--accent); }
+
+  .update-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .timeline { display: flex; flex-direction: column; gap: 6px; }
+
+  .timeline-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--card2);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .timeline-date { color: var(--muted); }
+  .timeline-kg { font-weight: 600; }
+  .diff-down { color: var(--accent); }
+  .diff-up { color: var(--danger); }
+
+  .empty-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px;
+  }
+
+  .config-banner {
+    background: #1c1410;
+    border: 1px solid var(--warn);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--warn);
+    margin-bottom: 12px;
+    display: none;
+  }
+  .config-banner.show { display: block; }
+  .config-banner input {
+    width: 100%;
+    margin-top: 8px;
+    background: var(--card2);
+    border: 1px solid var(--warn);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+  }
+  .config-banner button {
+    margin-top: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--warn);
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Background -->
-  <div class="bg-layer"></div>
-  <div class="petals-container" id="petalsContainer"></div>
+<h1>💪 泰宇減重追蹤</h1>
+<p class="subtitle">開始日期：2025/06/25 ・ 目標：72.9 → 62.0 kg</p>
 
-  <!-- Nav -->
-  <nav id="mainNav">
-    <div class="nav-brand">
-      <span class="en">Taicosmia</span>
-      <span class="zh">✦ 星語蝶花 ✦</span>
+<div class="config-banner" id="configBanner">
+  ⚙️ 請先設定 Google Apps Script 網址才能使用雲端同步與 AI 功能
+  <input type="text" id="gasUrlInput" placeholder="貼上你的 GAS Web App URL（https://script.google.com/macros/s/...）">
+  <button onclick="saveGasUrl()">儲存</button>
+</div>
+
+<!-- 進度 -->
+<div class="card">
+  <div class="card-title">📊 減重進度</div>
+  <div class="weight-display">
+    <div class="weight-box">
+      <div class="label">目前體重</div>
+      <div class="value green" id="currentWeight">72.9</div>
+      <div class="label">kg</div>
     </div>
-    <ul class="nav-links">
-      <li><a href="#concept">品牌故事</a></li>
-      <li><a href="#works">創作</a></li>
-      <li><a href="#connect">找到我</a></li>
-      <li><a href="https://github.com/Taicosmia" target="_blank" class="nav-cta">GitHub ✦</a></li>
-    </ul>
-  </nav>
-
-  <!-- Hero -->
-  <section class="hero" id="home">
-    <span class="hero-deco hero-deco-tl">🦋</span>
-    <span class="hero-deco hero-deco-tr">🌸</span>
-    <span class="hero-deco hero-deco-bl">🌷</span>
-    <span class="hero-deco hero-deco-br">✨</span>
-
-    <div class="hero-inner">
-      <div class="hero-badge">
-        <span class="butterfly">🦋</span>
-        每一個心意，都好好送到你手上
-      </div>
-      <p class="hero-eyebrow">Welcome to</p>
-      <h1 class="hero-title">
-        <span class="shimmer">Taicosmia</span>
-      </h1>
-      <p class="hero-subtitle-zh">星　語　蝶　花</p>
-      <div class="hero-divider">
-        <span></span>
-        <span class="icon">🌸</span>
-        <span></span>
-      </div>
-      <p class="hero-tagline">
-        在宇宙的某個角落，有蝴蝶與花朵低語。<br/>
-        <em>Somewhere in the cosmos, butterflies and flowers whisper.</em>
-      </p>
-      <div class="hero-actions">
-        <a href="#concept" class="btn-rose">探索品牌故事 🦋</a>
-        <a href="https://github.com/Taicosmia" target="_blank" class="btn-ghost">GitHub ✦</a>
-      </div>
+    <div class="weight-box">
+      <div class="label">已減少</div>
+      <div class="value cyan" id="lostWeight">0.0</div>
+      <div class="label">kg</div>
     </div>
-  </section>
-
-  <div class="divider-flower">
-    <span class="icon">🌸</span>
-    <span class="icon">🦋</span>
-    <span class="icon">🌼</span>
+    <div class="weight-box">
+      <div class="label">距目標</div>
+      <div class="value warn" id="remaining">10.9</div>
+      <div class="label">kg</div>
+    </div>
   </div>
-
-  <!-- Brand Concept -->
-  <section class="section" id="concept">
-    <div class="section-tag"><span class="flower">🌷</span> Brand Story</div>
-    <h2 class="section-title">關於 <span class="accent">星語蝶花</span></h2>
-    <p class="section-desc">一個關於傳遞心意的品牌故事。</p>
-
-    <div class="concept-grid">
-      <div class="concept-visual fade-up">
-        <div class="concept-card">
-          <div class="float-deco float-deco-1">🦋</div>
-          <div class="float-deco float-deco-2">🌸</div>
-          <div class="float-deco float-deco-3">⭐</div>
-          <span class="concept-big-emoji">🦋</span>
-          <div class="concept-card-title">星語蝶花</div>
-          <div class="concept-card-sub">Taicosmia · Star · Butterfly · Flower</div>
-          <div class="concept-tags">
-            <span class="concept-tag blush">溫暖</span>
-            <span class="concept-tag lavender">創意</span>
-            <span class="concept-tag mint">真誠</span>
-            <span class="concept-tag honey">用心</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="concept-text fade-up delay-1">
-        <p>
-          <strong>Taicosmia</strong> 源自「宇宙」（cosmos）——
-          就像宇宙中每一顆星都有它的位置，
-          每一份心意也有它應該抵達的地方。
-        </p>
-        <p>
-          <strong>星語蝶花</strong> 是這個品牌的靈魂：
-          星星低語著秘密，蝴蝶承載著思念，
-          花朵盛開時訴說著愛與溫柔。
-        </p>
-        <div class="concept-quote">
-          <p>「每一個心意，都好好送到對方手上。」<br/>
-          Every feeling, carefully delivered to you.</p>
-        </div>
-        <p>
-          我們相信，<strong>創作是傳遞心意最美的方式</strong>。
-          無論是一張插圖、一個設計、還是一段文字，
-          都是蝴蝶振翅的瞬間——輕盈而真實。
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider-flower">
-    <span class="icon">✨</span>
-    <span class="icon">🌸</span>
-    <span class="icon">✨</span>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar" style="width:0%"></div>
   </div>
-
-  <!-- Values -->
-  <section class="section" id="values">
-    <div class="section-tag"><span class="flower">🌼</span> Core Values</div>
-    <h2 class="section-title">品牌<span class="accent">核心理念</span></h2>
-    <p class="section-desc">每一個創作背後，都有這三個信念在守護。</p>
-
-    <div class="values-grid">
-      <div class="value-card v1 fade-up">
-        <span class="value-emoji">🌸</span>
-        <div class="value-title">溫暖傳遞</div>
-        <div class="value-desc">每一份心意都值得被好好對待。我們用最溫柔的方式，讓感情跨越距離，抵達彼此心中。</div>
-      </div>
-      <div class="value-card v2 fade-up delay-1">
-        <span class="value-emoji">🦋</span>
-        <div class="value-title">自由創作</div>
-        <div class="value-desc">像蝴蝶在花間飛舞，創意不設邊界。我們在每一個作品中，放入最純粹的靈感與熱情。</div>
-      </div>
-      <div class="value-card v3 fade-up delay-2">
-        <span class="value-emoji">⭐</span>
-        <div class="value-title">星語真誠</div>
-        <div class="value-desc">用星星的方式低語——真實、閃亮、長久。每一個細節都是對你的誠摯承諾。</div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider-flower">
-    <span class="icon">🦋</span>
-    <span class="icon">🌷</span>
-    <span class="icon">🦋</span>
+  <div class="progress-labels">
+    <span>72.9kg</span>
+    <span id="progressPct">0%</span>
+    <span>62.0kg</span>
   </div>
+</div>
 
-  <!-- Works -->
-  <section class="section" id="works">
-    <div class="section-tag"><span class="flower">🎨</span> Creative Works</div>
-    <h2 class="section-title">創作<span class="accent">作品</span></h2>
-    <p class="section-desc">蝴蝶與花朵的故事，正在一頁一頁展開……</p>
-
-    <div class="works-grid">
-      <div class="work-card fade-up">
-        <div class="work-thumb w1">🦋</div>
-        <div class="work-body">
-          <div class="work-category">Illustration · 插圖</div>
-          <div class="work-title">蝶舞系列</div>
-          <div class="work-desc">以蝴蝶為主角的一系列插圖，每隻蝴蝶都承載著一個獨特的心情故事。</div>
-          <div class="work-coming">✦ Coming Soon</div>
-        </div>
-      </div>
-      <div class="work-card fade-up delay-1">
-        <div class="work-thumb w2">🌸</div>
-        <div class="work-body">
-          <div class="work-category">Design · 設計</div>
-          <div class="work-title">花語明信片</div>
-          <div class="work-desc">用花語訴說心意的手作明信片，讓每一朵花都成為送給你的祝福。</div>
-          <div class="work-coming">✦ Coming Soon</div>
-        </div>
-      </div>
-      <div class="work-card fade-up delay-2">
-        <div class="work-thumb w3">⭐</div>
-        <div class="work-body">
-          <div class="work-category">Story · 故事</div>
-          <div class="work-title">星語小說</div>
-          <div class="work-desc">在宇宙與花田之間，一段關於心意與相遇的溫柔故事。</div>
-          <div class="work-coming">✦ Coming Soon</div>
-        </div>
-      </div>
-      <div class="work-card fade-up delay-3">
-        <div class="work-thumb w4">🎁</div>
-        <div class="work-body">
-          <div class="work-category">Gift · 禮物</div>
-          <div class="work-title">心意禮盒</div>
-          <div class="work-desc">精心策劃的禮物組合，把溫暖和祝福一起包進去，送到最重要的人手中。</div>
-          <div class="work-coming">✦ Coming Soon</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider-flower">
-    <span class="icon">🌸</span>
-    <span class="icon">✨</span>
-    <span class="icon">🌸</span>
+<!-- 體重更新 -->
+<div class="card">
+  <div class="card-title">⚖️ 更新體重</div>
+  <div class="weight-input-row">
+    <input type="number" id="newWeight" placeholder="輸入今日體重 kg" step="0.1" min="40" max="150">
+    <button class="update-btn" onclick="updateWeight()">更新</button>
   </div>
+  <div class="timeline" id="weightTimeline">
+    <div class="empty-msg">尚無記錄</div>
+  </div>
+</div>
 
-  <!-- Connect -->
-  <section class="section" id="connect">
-    <div class="section-tag"><span class="flower">💌</span> Find Me</div>
-    <h2 class="section-title">找到<span class="accent">我們</span></h2>
-    <p class="section-desc">來和我們說說你的心意，一起把美好的事情送出去。</p>
+<!-- 每日清單 -->
+<div class="card">
+  <div class="card-title">✅ 今日執行清單</div>
+  <div class="checklist" id="checklist"></div>
+</div>
 
-    <div class="links-grid fade-up">
-      <a href="https://github.com/Taicosmia" target="_blank" class="link-card">
-        <div class="link-icon github">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="#c4617a">
-            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
-          </svg>
-        </div>
-        <div class="link-info">
-          <strong>GitHub</strong>
-          <span>github.com/Taicosmia</span>
-        </div>
-      </a>
-
-      <a href="mailto:taiyu.twn@gmail.com" class="link-card">
-        <div class="link-icon email">🌷</div>
-        <div class="link-info">
-          <strong>Email</strong>
-          <span>taiyu.twn@gmail.com</span>
-        </div>
-      </a>
+<!-- AI 教練 -->
+<div class="card">
+  <div class="card-title">🤖 AI 教練分析</div>
+  <div class="log-section">
+    <div class="log-tabs">
+      <button class="tab-btn active" onclick="setTab('food')" id="tab-food">🍱 飲食</button>
+      <button class="tab-btn" onclick="setTab('move')" id="tab-move">🏃 運動</button>
+      <button class="tab-btn" onclick="setTab('free')" id="tab-free">💬 提問</button>
     </div>
+    <textarea id="logInput" placeholder="例如：早餐吃了混合飲、雞蛋、蘋果，午餐排骨便當..."></textarea>
+    <button class="send-btn" id="sendBtn" onclick="analyzeLog()">分析並給建議 →</button>
+    <div class="ai-bubble" id="aiBubble"></div>
+  </div>
+</div>
 
-    <!-- CTA -->
-    <div style="margin-top: 3rem;">
-      <div class="cta-banner fade-up">
-        <span class="cta-emoji">🦋</span>
-        <h3 class="cta-title">有想法想分享嗎？</h3>
-        <p class="cta-desc">
-          無論是合作提案、創作交流，還是只是想說聲你好——<br/>
-          蝴蝶的翅膀隨時準備好，替你把心意送出去。
-        </p>
-        <a href="mailto:taiyu.twn@gmail.com" class="btn-rose">送出心意 💌</a>
-      </div>
-    </div>
-  </section>
+<!-- 歷史記錄 -->
+<div class="card">
+  <div class="card-title">📝 記錄歷史</div>
+  <div class="history-list" id="historyList">
+    <div class="empty-msg">尚無記錄</div>
+  </div>
+</div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="footer-inner">
-      <span class="footer-brand">Taicosmia ✦ 星語蝶花</span>
-      <span class="footer-copy">© 2025 Taicosmia · Every feeling, carefully delivered 🦋</span>
-      <div class="footer-links">
-        <a href="#home">Top</a>
-        <a href="https://github.com/Taicosmia" target="_blank">GitHub</a>
-        <a href="mailto:taiyu.twn@gmail.com">Email</a>
-      </div>
-    </div>
-  </footer>
+<script>
+const CONFIG = {
+  GAS_URL: localStorage.getItem('gasUrl') || '',
+  startWeight: 72.9,
+  targetWeight: 62.0,
+  startDate: '2025-06-25',
+};
 
-  <script>
-    // ===== Falling petals =====
-    const container = document.getElementById('petalsContainer');
-    const petalEmojis = ['🌸', '🌺', '🌼', '🌷', '✿', '❀'];
+function checkGasUrl() {
+  if (!CONFIG.GAS_URL) {
+    document.getElementById('configBanner').classList.add('show');
+  }
+}
 
-    function createPetal() {
-      const el = document.createElement('span');
-      el.className = 'petal';
-      el.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
-      el.style.cssText = `
-        left: ${Math.random() * 100}%;
-        font-size: ${0.7 + Math.random() * 1.2}rem;
-        animation-duration: ${8 + Math.random() * 10}s;
-        animation-delay: ${Math.random() * 8}s;
-      `;
-      container.appendChild(el);
-      el.addEventListener('animationend', () => el.remove());
-    }
+function saveGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    alert('請輸入正確的 GAS URL');
+    return;
+  }
+  CONFIG.GAS_URL = url;
+  localStorage.setItem('gasUrl', url);
+  document.getElementById('configBanner').classList.remove('show');
+  loadFromGAS();
+}
 
-    // Initial petals
-    for (let i = 0; i < 12; i++) setTimeout(createPetal, i * 600);
-    // Continuous petals
-    setInterval(createPetal, 1800);
+async function gasGet(action, params = {}) {
+  if (!CONFIG.GAS_URL) return null;
+  const url = new URL(CONFIG.GAS_URL);
+  url.searchParams.set('action', action);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  try {
+    const res = await fetch(url.toString());
+    return await res.json();
+  } catch (e) {
+    console.error('GAS GET error:', e);
+    return null;
+  }
+}
 
-    // ===== Scroll fade-in =====
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-    // ===== Nav scroll =====
-    window.addEventListener('scroll', () => {
-      const nav = document.getElementById('mainNav');
-      nav.style.boxShadow = window.scrollY > 40
-        ? '0 4px 20px rgba(196,97,122,0.1)'
-        : 'none';
+async function gasPost(action, body = {}) {
+  if (!CONFIG.GAS_URL) return null;
+  const url = new URL(CONFIG.GAS_URL);
+  url.searchParams.set('action', action);
+  try {
+    const res = await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     });
-  </script>
+    return await res.json();
+  } catch (e) {
+    console.error('GAS POST error:', e);
+    return null;
+  }
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+let weightHistory = JSON.parse(localStorage.getItem('weightHistory') || '[]');
+let logHistory    = JSON.parse(localStorage.getItem('logHistory') || '[]');
+let todayChecks   = JSON.parse(localStorage.getItem('checks_' + todayStr()) || '{}');
+let currentTab    = 'food';
+
+const CHECKLIST = [
+  { id: 'sup1',  text: '起床：強健活力組合（全套）',              tag: 'sup',  label: '補充品' },
+  { id: 'food1', text: '早餐：混合飲 + 雞蛋 + 蘋果',            tag: 'food', label: '飲食' },
+  { id: 'move1', text: '早上：走路30分鐘',                        tag: 'move', label: '運動' },
+  { id: 'sup2',  text: '早餐後：好甘萃1錠',                      tag: 'sup',  label: '補充品' },
+  { id: 'food2', text: '午餐：低油高蛋白外食',                    tag: 'food', label: '飲食' },
+  { id: 'sup3',  text: '午餐後：好甘萃1錠',                      tag: 'sup',  label: '補充品' },
+  { id: 'move2', text: '中午：爬樓梯18層',                        tag: 'move', label: '運動' },
+  { id: 'food3', text: '下午：混合飲40g',                         tag: 'food', label: '飲食' },
+  { id: 'food4', text: '晚餐：混合飲 + 茶葉蛋（7-8點）',         tag: 'food', label: '飲食' },
+  { id: 'sup4',  text: '晚餐後：強健活力組合（無倍欣）+ 好甘萃', tag: 'sup',  label: '補充品' },
+  { id: 'move3', text: '晚上9-10點：滑步機1小時',                 tag: 'move', label: '運動' },
+  { id: 'food5', text: '運動後：蛋白素2匙 + 水',                 tag: 'food', label: '飲食' },
+  { id: 'sup5',  text: '睡前：加美D鈣片2顆',                     tag: 'sup',  label: '補充品' },
+];
+
+function renderChecklist() {
+  document.getElementById('checklist').innerHTML = CHECKLIST.map(item => {
+    const done = !!todayChecks[item.id];
+    return `<div class="check-item ${done ? 'done' : ''}" onclick="toggleCheck('${item.id}')">
+      <div class="check-icon">${done ? '✓' : ''}</div>
+      <div class="check-text">${item.text}</div>
+      <span class="check-tag tag-${item.tag}">${item.label}</span>
+    </div>`;
+  }).join('');
+}
+
+async function toggleCheck(id) {
+  todayChecks[id] = !todayChecks[id];
+  localStorage.setItem('checks_' + todayStr(), JSON.stringify(todayChecks));
+  renderChecklist();
+  await gasPost('toggleCheck', { date: todayStr(), id, done: todayChecks[id] });
+}
+
+async function updateWeight() {
+  const val = parseFloat(document.getElementById('newWeight').value);
+  if (!val || val < 40 || val > 150) { alert('請輸入正確體重'); return; }
+
+  const entry = { date: todayStr(), weight: val };
+  weightHistory = weightHistory.filter(e => e.date !== todayStr());
+  weightHistory.push(entry);
+  weightHistory.sort((a, b) => a.date.localeCompare(b.date));
+  localStorage.setItem('weightHistory', JSON.stringify(weightHistory));
+
+  document.getElementById('newWeight').value = '';
+  renderProgress();
+  renderTimeline();
+
+  await gasPost('addWeight', entry);
+}
+
+function renderProgress() {
+  const latest = weightHistory.length
+    ? weightHistory[weightHistory.length - 1].weight
+    : CONFIG.startWeight;
+  const lost  = Math.max(0, CONFIG.startWeight - latest);
+  const total = CONFIG.startWeight - CONFIG.targetWeight;
+  const pct   = Math.min(100, lost / total * 100).toFixed(1);
+  const rem   = Math.max(0, latest - CONFIG.targetWeight);
+
+  document.getElementById('currentWeight').textContent = latest.toFixed(1);
+  document.getElementById('lostWeight').textContent    = lost.toFixed(1);
+  document.getElementById('remaining').textContent     = rem.toFixed(1);
+  document.getElementById('progressBar').style.width   = pct + '%';
+  document.getElementById('progressPct').textContent   = pct + '%';
+}
+
+function renderTimeline() {
+  const el = document.getElementById('weightTimeline');
+  if (!weightHistory.length) {
+    el.innerHTML = '<div class="empty-msg">尚無記錄</div>';
+    return;
+  }
+  el.innerHTML = [...weightHistory].reverse().slice(0, 6).map((e, i, arr) => {
+    const prev = arr[i + 1];
+    const diff = prev ? (e.weight - prev.weight).toFixed(1) : null;
+    const diffHtml = diff !== null
+      ? `<span class="${parseFloat(diff) < 0 ? 'diff-down' : 'diff-up'}">${parseFloat(diff) > 0 ? '+' : ''}${diff} kg</span>`
+      : '<span style="color:var(--muted)">起點</span>';
+    return `<div class="timeline-item">
+      <span class="timeline-date">${e.date}</span>
+      <span class="timeline-kg">${e.weight} kg</span>
+      ${diffHtml}
+    </div>`;
+  }).join('');
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  const ph = {
+    food: '例如：早餐混合飲+蛋+蘋果，午餐排骨便當，晚上喝了珍奶...',
+    move: '例如：早上走路完成，中午忘了爬樓梯，滑步機只做30分鐘...',
+    free: '例如：體重停滯3天怎麼辦？或本週想多吃一餐正常晚餐可以嗎？',
+  };
+  document.getElementById('logInput').placeholder = ph[tab];
+}
+
+async function analyzeLog() {
+  const input = document.getElementById('logInput').value.trim();
+  if (!input) return;
+  if (!CONFIG.GAS_URL) {
+    document.getElementById('configBanner').classList.add('show');
+    return;
+  }
+
+  const btn    = document.getElementById('sendBtn');
+  const bubble = document.getElementById('aiBubble');
+  btn.disabled = true;
+  bubble.classList.add('show');
+  bubble.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+  const latest  = weightHistory.length ? weightHistory[weightHistory.length - 1].weight : CONFIG.startWeight;
+  const lost    = (CONFIG.startWeight - latest).toFixed(1);
+  const tabLabels = { food: '飲食記錄', move: '運動記錄', free: '自由提問' };
+
+  const unchecked = CHECKLIST.filter(i => !todayChecks[i.id]).map(i => i.text);
+
+  const result = await gasPost('analyze', {
+    type:      currentTab,
+    input,
+    weight:    latest,
+    lost,
+    remaining: (latest - CONFIG.targetWeight).toFixed(1),
+    unchecked,
+  });
+
+  const text = result?.reply || '無法取得回應，請確認 GAS 設定正確。';
+  bubble.textContent = text;
+
+  const entry = {
+    date:    new Date().toLocaleString('zh-TW'),
+    type:    tabLabels[currentTab],
+    tag:     currentTab,
+    content: input,
+    ai:      text,
+  };
+  logHistory.unshift(entry);
+  if (logHistory.length > 20) logHistory.pop();
+  localStorage.setItem('logHistory', JSON.stringify(logHistory));
+  renderHistory();
+
+  document.getElementById('logInput').value = '';
+  btn.disabled = false;
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!logHistory.length) {
+    el.innerHTML = '<div class="empty-msg">尚無記錄</div>';
+    return;
+  }
+  const tagColor = { food: 'tag-food', move: 'tag-move', free: 'tag-sup' };
+  el.innerHTML = logHistory.map(e => `
+    <div class="history-item">
+      <div class="history-meta">
+        <span class="check-tag ${tagColor[e.tag] || 'tag-sup'}">${e.type}</span>
+        <span class="history-date">${e.date}</span>
+      </div>
+      <div class="history-content">${e.content}</div>
+      <div class="history-ai">🤖 ${e.ai.slice(0, 80)}${e.ai.length > 80 ? '...' : ''}</div>
+    </div>
+  `).join('');
+}
+
+async function loadFromGAS() {
+  const wData = await gasGet('getWeight');
+  if (wData?.records?.length) {
+    weightHistory = wData.records;
+    localStorage.setItem('weightHistory', JSON.stringify(weightHistory));
+    renderProgress();
+    renderTimeline();
+  }
+
+  const cData = await gasGet('getChecks', { date: todayStr() });
+  if (cData?.checks) {
+    todayChecks = cData.checks;
+    localStorage.setItem('checks_' + todayStr(), JSON.stringify(todayChecks));
+    renderChecklist();
+  }
+
+  const lData = await gasGet('getLogs');
+  if (lData?.logs?.length) {
+    logHistory = lData.logs;
+    localStorage.setItem('logHistory', JSON.stringify(logHistory));
+    renderHistory();
+  }
+}
+
+checkGasUrl();
+renderChecklist();
+renderProgress();
+renderTimeline();
+renderHistory();
+if (CONFIG.GAS_URL) loadFromGAS();
+</script>
 </body>
 </html>
