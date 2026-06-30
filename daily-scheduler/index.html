@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>每日行程排程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --rose:      #e8859a;
+      --deep-rose: #c4617a;
+      --blush:     #f9c0c7;
+      --peach:     #fdd5b1;
+      --lavender:  #d9c7f5;
+      --violet:    #b39ddb;
+      --mint:      #c8f0e0;
+      --honey:     #f5c842;
+      --sky:       #b8e0f7;
+      --cream:     #fef8f2;
+      --petal:     #fff0f5;
+      --text-dark: #4a3040;
+      --text-mid:  #7a5566;
+      --text-soft: #a07888;
+      --radius:    14px;
+      --radius-sm: 8px;
+      --shadow:    0 8px 32px rgba(196,97,122,0.13);
+      --shadow-sm: 0 3px 14px rgba(196,97,122,0.09);
+      --font: 'Nunito', 'Noto Sans TC', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--petal); }
+    ::-webkit-scrollbar-thumb { background: var(--rose); border-radius: 3px; }
+
+    /* ===== Header ===== */
+    header {
+      background: rgba(254,248,242,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1.5px solid rgba(232,133,154,0.18);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(196,97,122,0.07);
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .header-title h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--deep-rose);
+      letter-spacing: 0.04em;
+    }
+    .header-title .icon { font-size: 1.5rem; }
+    .header-date {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .header-back {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .header-back:hover { color: var(--deep-rose); }
+
+    /* ===== Layout ===== */
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.8rem;
+      align-items: start;
+    }
+
+    /* ===== Panel ===== */
+    .panel {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid rgba(232,133,154,0.12);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1.5px solid rgba(232,133,154,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .panel-header h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .panel-header .ph-icon { font-size: 1.1rem; }
+    .panel-body { padding: 1.4rem; }
+
+    /* ===== Form ===== */
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid rgba(232,133,154,0.25);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.92rem;
+      color: var(--text-dark);
+      background: var(--petal);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(232,133,154,0.15);
+      background: white;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      margin-top: 0.3rem;
+    }
+    .btn-add {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--rose), var(--violet));
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: all 0.25s;
+      box-shadow: 0 4px 14px rgba(179,157,219,0.3);
+    }
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(179,157,219,0.45);
+    }
+    .btn-add:active { transform: translateY(0); }
+
+    /* ===== Day config ===== */
+    .day-config {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      padding: 0.7rem 1.4rem;
+      background: rgba(249,192,199,0.08);
+      border-bottom: 1.5px solid rgba(232,133,154,0.1);
+    }
+    .day-config label { font-size: 0.8rem; color: var(--text-soft); font-weight: 600; white-space: nowrap; }
+    .day-config input {
+      width: 90px;
+      padding: 0.35rem 0.6rem;
+      border: 1.5px solid rgba(232,133,154,0.25);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: var(--font);
+      color: var(--text-dark);
+      background: white;
+      outline: none;
+    }
+    .day-config input:focus { border-color: var(--rose); }
+    .day-config .sep { color: var(--text-soft); font-size: 0.8rem; }
+
+    /* ===== Task list ===== */
+    .task-list { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .task-item:hover { border-color: rgba(232,133,154,0.25); box-shadow: var(--shadow-sm); }
+    .task-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .task-info { flex: 1; min-width: 0; }
+    .task-name { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-meta { font-size: 0.75rem; color: var(--text-soft); margin-top: 0.15rem; }
+    .task-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 50px;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .badge-fixed { background: rgba(245,200,66,0.2); color: #9a7a0a; border: 1px solid rgba(245,200,66,0.4); }
+    .badge-auto  { background: rgba(200,240,224,0.4); color: #2e8a60; border: 1px solid rgba(200,240,224,0.7); }
+    .task-del {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      padding: 0.2rem;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+    .task-del:hover { color: var(--deep-rose); background: rgba(196,97,122,0.08); }
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+      line-height: 1.8;
+    }
+    .empty-state .es-icon { font-size: 2.5rem; display: block; margin-bottom: 0.6rem; opacity: 0.5; }
+
+    /* ===== Timeline panel ===== */
+    .timeline-panel { position: sticky; top: 90px; }
+    .timeline-toolbar {
+      padding: 0.7rem 1.4rem;
+      border-bottom: 1.5px solid rgba(232,133,154,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .btn-clear {
+      margin-left: auto;
+      background: none;
+      border: 1.5px solid rgba(196,97,122,0.3);
+      border-radius: 6px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.78rem;
+      font-family: var(--font);
+      font-weight: 700;
+      color: var(--deep-rose);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-clear:hover { background: rgba(196,97,122,0.07); }
+    .stat-chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 50px;
+      background: rgba(249,192,199,0.25);
+      color: var(--deep-rose);
+      border: 1px solid rgba(249,192,199,0.5);
+    }
+
+    /* ===== Timeline ===== */
+    .timeline-wrap {
+      padding: 1.2rem 1.4rem;
+      overflow-x: auto;
+    }
+    .timeline {
+      position: relative;
+      min-width: 600px;
+    }
+    .tl-hour-row {
+      display: flex;
+      align-items: flex-start;
+      min-height: 52px;
+    }
+    .tl-hour-row:last-child { min-height: 24px; }
+    .tl-label {
+      width: 52px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      letter-spacing: 0.04em;
+      padding-top: 2px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .tl-col {
+      flex: 1;
+      position: relative;
+    }
+    .tl-line {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: rgba(232,133,154,0.15);
+    }
+    .tl-now-line {
+      position: absolute;
+      left: 52px; right: 0;
+      height: 2px;
+      background: var(--deep-rose);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .tl-now-dot {
+      position: absolute;
+      left: -5px;
+      top: -4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--deep-rose);
+    }
+    .tl-now-label {
+      position: absolute;
+      right: 4px;
+      top: -9px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--deep-rose);
+      background: white;
+      padding: 0 4px;
+      border-radius: 3px;
+      line-height: 1.6;
+    }
+
+    /* ===== Event blocks ===== */
+    .tl-events {
+      position: absolute;
+      top: 0;
+      left: 52px;
+      right: 0;
+    }
+    .tl-event {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: default;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border-left: 3.5px solid transparent;
+      line-height: 1.4;
+      z-index: 2;
+    }
+    .tl-event:hover {
+      transform: scaleX(1.01);
+      z-index: 5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .tl-event .ev-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tl-event .ev-time {
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.75;
+      margin-top: 1px;
+    }
+
+    /* ===== Summary ===== */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      padding: 1rem 1.4rem;
+      border-top: 1.5px solid rgba(232,133,154,0.1);
+    }
+    .summary-card {
+      text-align: center;
+      padding: 0.7rem;
+      background: var(--petal);
+      border-radius: var(--radius-sm);
+    }
+    .sc-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--deep-rose);
+      line-height: 1.2;
+    }
+    .sc-label { font-size: 0.72rem; color: var(--text-soft); font-weight: 600; margin-top: 0.2rem; }
+
+    /* ===== Conflict alert ===== */
+    .conflict-list {
+      margin: 0 1.4rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .conflict-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      background: rgba(245,200,66,0.15);
+      border: 1.5px solid rgba(245,200,66,0.4);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: #7a5a00;
+      font-weight: 600;
+    }
+
+    /* ===== Toast ===== */
+    .toast-wrap {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast {
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: var(--text-dark);
+      color: white;
+      box-shadow: var(--shadow);
+      animation: toastIn 0.3s ease forwards;
+      pointer-events: auto;
+    }
+    .toast.success { background: linear-gradient(135deg, #2e8a60, #3aaa78); }
+    .toast.error   { background: linear-gradient(135deg, var(--deep-rose), #a03050); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .timeline-panel { position: static; }
+      .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .app { padding: 1rem; }
+      header { padding: 0.8rem 1rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <span class="icon">🗓️</span>
+    <h1>每日行程排程</h1>
+  </div>
+  <span class="header-date" id="todayLabel"></span>
+  <a href="../" class="header-back">← 回首頁</a>
+</header>
+
+<div class="app">
+
+  <!-- Left: Input Panel -->
+  <div>
+    <!-- Day range config -->
+    <div class="panel" style="margin-bottom:1.2rem">
+      <div class="panel-header">
+        <span class="ph-icon">⏰</span>
+        <h2>一天的時間範圍</h2>
+      </div>
+      <div class="day-config">
+        <label>開始</label>
+        <input type="time" id="dayStart" value="08:00" />
+        <span class="sep">—</span>
+        <label>結束</label>
+        <input type="time" id="dayEnd" value="22:00" />
+      </div>
+    </div>
+
+    <!-- Add task -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-icon">✏️</span>
+        <h2>新增項目</h2>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label>項目名稱</label>
+          <input type="text" id="taskName" placeholder="例：晨間運動、開會、午餐…" maxlength="40" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>指定時間 <span style="font-weight:400;opacity:.6">（選填）</span></label>
+            <input type="time" id="taskTime" />
+            <div class="form-hint">留空 = 自動排入空檔</div>
+          </div>
+          <div class="form-group">
+            <label>時間長度</label>
+            <select id="taskDuration">
+              <option value="15">15 分鐘</option>
+              <option value="30">30 分鐘</option>
+              <option value="45">45 分鐘</option>
+              <option value="60" selected>1 小時</option>
+              <option value="90">1.5 小時</option>
+              <option value="120">2 小時</option>
+              <option value="150">2.5 小時</option>
+              <option value="180">3 小時</option>
+              <option value="240">4 小時</option>
+              <option value="custom">自訂…</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" id="customDurGroup" style="display:none">
+          <label>自訂分鐘數</label>
+          <input type="number" id="customDur" placeholder="例：75" min="5" max="1440" />
+        </div>
+        <div class="form-group">
+          <label>顏色標籤</label>
+          <select id="taskColor">
+            <option value="rose">🌸 玫瑰（預設）</option>
+            <option value="violet">💜 薰衣草</option>
+            <option value="mint">🌿 薄荷</option>
+            <option value="honey">🌼 蜂蜜黃</option>
+            <option value="sky">🩵 天空藍</option>
+            <option value="peach">🍑 蜜桃</option>
+          </select>
+        </div>
+        <button class="btn-add" id="btnAdd">＋ 加入行程</button>
+      </div>
+
+      <!-- Task list -->
+      <div style="padding:0 1.4rem 1.4rem">
+        <div id="taskList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Timeline Panel -->
+  <div class="panel timeline-panel">
+    <div class="panel-header">
+      <span class="ph-icon">📊</span>
+      <h2>今日時間軸</h2>
+      <button class="btn-clear" id="btnClear">清除全部</button>
+    </div>
+    <div class="timeline-toolbar">
+      <span class="stat-chip" id="statTotal">共 0 項</span>
+      <span class="stat-chip" id="statHours">0 小時</span>
+      <span class="stat-chip" id="statFree">空閒 0 小時</span>
+    </div>
+    <div id="conflictArea"></div>
+    <div class="timeline-wrap">
+      <div class="timeline" id="timeline"></div>
+    </div>
+    <div class="summary-grid" id="summaryGrid">
+      <div class="summary-card"><div class="sc-val" id="sv1">0</div><div class="sc-label">固定項目</div></div>
+      <div class="summary-card"><div class="sc-val" id="sv2">0</div><div class="sc-label">自動排入</div></div>
+      <div class="summary-card"><div class="sc-val" id="sv3">0%</div><div class="sc-label">時間使用率</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  // ===== State =====
+  let tasks = JSON.parse(localStorage.getItem('scheduler_tasks') || '[]');
+  let nextId = parseInt(localStorage.getItem('scheduler_nextId') || '1');
+
+  const COLOR_MAP = {
+    rose:   { bg: 'rgba(249,192,199,0.45)', border: '#e8859a', text: '#a03050' },
+    violet: { bg: 'rgba(217,199,245,0.5)',  border: '#b39ddb', text: '#5c3a9a' },
+    mint:   { bg: 'rgba(200,240,224,0.5)',  border: '#6bc8a0', text: '#1e6e48' },
+    honey:  { bg: 'rgba(245,200,66,0.25)',  border: '#d4a800', text: '#7a5800' },
+    sky:    { bg: 'rgba(184,224,247,0.5)',  border: '#5aaad4', text: '#1a5a80' },
+    peach:  { bg: 'rgba(253,213,177,0.55)', border: '#f5a04a', text: '#8a4800' },
+  };
+
+  // ===== Utils =====
+  const timeToMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+  const minToTime = m => { const h = Math.floor(m/60), mm = m%60; return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; };
+  const save = () => {
+    localStorage.setItem('scheduler_tasks', JSON.stringify(tasks));
+    localStorage.setItem('scheduler_nextId', nextId);
+  };
+
+  // ===== Day range =====
+  const dayStartEl = document.getElementById('dayStart');
+  const dayEndEl   = document.getElementById('dayEnd');
+  dayStartEl.value = localStorage.getItem('scheduler_dayStart') || '08:00';
+  dayEndEl.value   = localStorage.getItem('scheduler_dayEnd')   || '22:00';
+  dayStartEl.addEventListener('change', () => { localStorage.setItem('scheduler_dayStart', dayStartEl.value); rescheduleAndRender(); });
+  dayEndEl.addEventListener('change',   () => { localStorage.setItem('scheduler_dayEnd',   dayEndEl.value);   rescheduleAndRender(); });
+
+  // ===== Scheduling =====
+  function schedule() {
+    const dayStart = timeToMin(dayStartEl.value);
+    const dayEnd   = timeToMin(dayEndEl.value);
+
+    // Sort fixed tasks by time, collect their intervals
+    const fixed = tasks.filter(t => t.fixedTime !== null).sort((a,b) => timeToMin(a.fixedTime) - timeToMin(b.fixedTime));
+    const auto  = tasks.filter(t => t.fixedTime === null);
+
+    // Build occupied intervals from fixed tasks
+    const occupied = fixed.map(t => ({
+      start: timeToMin(t.fixedTime),
+      end:   timeToMin(t.fixedTime) + t.duration,
+      id:    t.id,
+    }));
+
+    // Assign scheduled times to fixed tasks
+    fixed.forEach(t => {
+      t.scheduledStart = t.fixedTime;
+      t.scheduledEnd   = minToTime(timeToMin(t.fixedTime) + t.duration);
+    });
+
+    // Auto-schedule: find first free slot
+    auto.forEach(t => {
+      const slot = findSlot(occupied, t.duration, dayStart, dayEnd);
+      if (slot !== null) {
+        t.scheduledStart = minToTime(slot);
+        t.scheduledEnd   = minToTime(slot + t.duration);
+        occupied.push({ start: slot, end: slot + t.duration, id: t.id });
+        occupied.sort((a,b) => a.start - b.start);
+      } else {
+        t.scheduledStart = null;
+        t.scheduledEnd   = null;
+      }
+    });
+  }
+
+  function findSlot(occupied, duration, dayStart, dayEnd) {
+    // Try every minute from dayStart to dayEnd - duration
+    let cursor = dayStart;
+    while (cursor + duration <= dayEnd) {
+      const conflicts = occupied.filter(o => cursor < o.end && cursor + duration > o.start);
+      if (conflicts.length === 0) return cursor;
+      // Jump to the end of the blocking interval
+      cursor = Math.max(...conflicts.map(o => o.end));
+    }
+    return null;
+  }
+
+  function getConflicts() {
+    const intervals = tasks
+      .filter(t => t.scheduledStart)
+      .map(t => ({ id: t.id, name: t.name, start: timeToMin(t.scheduledStart), end: timeToMin(t.scheduledEnd) }));
+
+    const conflicts = [];
+    for (let i = 0; i < intervals.length; i++) {
+      for (let j = i+1; j < intervals.length; j++) {
+        const a = intervals[i], b = intervals[j];
+        if (a.start < b.end && a.end > b.start) {
+          conflicts.push(`「${a.name}」與「${b.name}」時間重疊`);
+        }
+      }
+    }
+    return conflicts;
+  }
+
+  // ===== Render Timeline =====
+  function renderTimeline() {
+    const tl       = document.getElementById('timeline');
+    const dayStart = timeToMin(dayStartEl.value);
+    const dayEnd   = timeToMin(dayEndEl.value);
+    const totalMin = dayEnd - dayStart;
+    const PX_PER_MIN = 1.5; // pixels per minute
+    const totalPx  = totalMin * PX_PER_MIN;
+
+    tl.innerHTML = '';
+    tl.style.height = (totalPx + 24) + 'px';
+    tl.style.position = 'relative';
+
+    // Hour lines & labels
+    const startHour = Math.ceil(dayStart / 60);
+    const endHour   = Math.floor(dayEnd   / 60);
+    for (let h = startHour; h <= endHour; h++) {
+      const min = h * 60;
+      const y   = (min - dayStart) * PX_PER_MIN;
+
+      const label = document.createElement('div');
+      label.className = 'tl-label';
+      label.style.cssText = `position:absolute;top:${y-7}px;left:0;`;
+      label.textContent = `${String(h).padStart(2,'0')}:00`;
+      tl.appendChild(label);
+
+      const line = document.createElement('div');
+      line.style.cssText = `position:absolute;top:${y}px;left:52px;right:0;height:1px;background:rgba(232,133,154,${h % 3 === 0 ? 0.25 : 0.1});`;
+      tl.appendChild(line);
+
+      // Half-hour line
+      if (min + 30 < dayEnd) {
+        const hy = y + 30 * PX_PER_MIN;
+        const hline = document.createElement('div');
+        hline.style.cssText = `position:absolute;top:${hy}px;left:52px;right:0;height:1px;background:rgba(232,133,154,0.06);`;
+        tl.appendChild(hline);
+      }
+    }
+
+    // Now line
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    if (nowMin >= dayStart && nowMin <= dayEnd) {
+      const ny = (nowMin - dayStart) * PX_PER_MIN;
+      const nowLine = document.createElement('div');
+      nowLine.style.cssText = `position:absolute;top:${ny}px;left:52px;right:0;height:2px;background:var(--deep-rose);z-index:10;`;
+      const dot = document.createElement('div');
+      dot.style.cssText = `position:absolute;left:-4px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--deep-rose);`;
+      const lbl = document.createElement('span');
+      lbl.style.cssText = `position:absolute;right:4px;top:-9px;font-size:.65rem;font-weight:700;color:var(--deep-rose);background:white;padding:0 3px;border-radius:3px;line-height:1.6;`;
+      lbl.textContent = minToTime(nowMin);
+      nowLine.appendChild(dot);
+      nowLine.appendChild(lbl);
+      tl.appendChild(nowLine);
+    }
+
+    // Event blocks — handle overlaps with column slots
+    const scheduled = tasks.filter(t => t.scheduledStart);
+    // Simple overlap detection: assign columns
+    const sorted = [...scheduled].sort((a,b) => timeToMin(a.scheduledStart) - timeToMin(b.scheduledStart));
+    const cols = []; // each col is array of {end}
+
+    sorted.forEach(t => {
+      const s = timeToMin(t.scheduledStart);
+      const e = timeToMin(t.scheduledEnd);
+      let col = cols.findIndex(c => c.length === 0 || c[c.length-1].end <= s);
+      if (col === -1) { cols.push([]); col = cols.length - 1; }
+      cols[col].push({ end: e, task: t });
+      t._col = col;
+      t._cols = 1; // will update
+    });
+    const totalCols = cols.length || 1;
+    scheduled.forEach(t => { t._totalCols = totalCols; });
+
+    // Recompute totalCols per task by checking how many cols overlap
+    sorted.forEach(t => {
+      const s = timeToMin(t.scheduledStart);
+      const e = timeToMin(t.scheduledEnd);
+      let maxCol = t._col;
+      sorted.forEach(u => {
+        if (u.id !== t.id) {
+          const us = timeToMin(u.scheduledStart);
+          const ue = timeToMin(u.scheduledEnd);
+          if (s < ue && e > us) maxCol = Math.max(maxCol, u._col);
+        }
+      });
+      t._totalCols = maxCol + 1;
+    });
+
+    sorted.forEach(t => {
+      const s = timeToMin(t.scheduledStart);
+      const e = timeToMin(t.scheduledEnd);
+      const y = (s - dayStart) * PX_PER_MIN;
+      const h = (e - s) * PX_PER_MIN;
+      const col = t._col;
+      const nCols = t._totalCols;
+      const colW = 100 / nCols;
+
+      const c = COLOR_MAP[t.color] || COLOR_MAP.rose;
+      const block = document.createElement('div');
+      block.className = 'tl-event';
+      block.style.cssText = `
+        top:${y + 1}px;
+        height:${Math.max(h - 2, 16)}px;
+        left:calc(52px + ${col * colW}%);
+        right:calc(${(nCols - col - 1) * colW}%);
+        background:${c.bg};
+        border-left-color:${c.border};
+        color:${c.text};
+      `;
+      block.innerHTML = `
+        <div class="ev-name">${escHtml(t.name)}</div>
+        ${h >= 28 ? `<div class="ev-time">${t.scheduledStart} – ${t.scheduledEnd}</div>` : ''}
+      `;
+      block.title = `${t.name}\n${t.scheduledStart} – ${t.scheduledEnd} (${t.duration} 分鐘)`;
+      tl.appendChild(block);
+    });
+
+    // Unscheduled tasks
+    const unscheduled = tasks.filter(t => !t.scheduledStart && t.fixedTime === null);
+    if (unscheduled.length > 0) {
+      const warn = document.createElement('div');
+      warn.style.cssText = 'padding:.5rem 1.4rem;font-size:.78rem;color:#7a5800;font-weight:600;';
+      warn.textContent = `⚠️ ${unscheduled.map(t=>t.name).join('、')} 無法排入（時間不足）`;
+      tl.parentElement.parentElement.insertBefore(warn, tl.parentElement);
+    }
+  }
+
+  // ===== Render Task List =====
+  function renderTaskList() {
+    const el = document.getElementById('taskList');
+    if (tasks.length === 0) {
+      el.innerHTML = `<div class="empty-state"><span class="es-icon">📋</span>還沒有任何行程<br/>從上方新增第一個項目吧！</div>`;
+      return;
+    }
+    el.innerHTML = tasks.map(t => {
+      const c = COLOR_MAP[t.color] || COLOR_MAP.rose;
+      const timeStr = t.scheduledStart
+        ? `${t.scheduledStart} – ${t.scheduledEnd}`
+        : (t.fixedTime ? `${t.fixedTime} 開始（未排入）` : '無法排入');
+      return `
+        <div class="task-item" style="background:${c.bg.replace('0.45','0.2').replace('0.5','0.2').replace('0.55','0.2').replace('0.25','0.15')}">
+          <div class="task-color" style="background:${c.border}"></div>
+          <div class="task-info">
+            <div class="task-name">${escHtml(t.name)}</div>
+            <div class="task-meta">${timeStr} · ${t.duration} 分鐘</div>
+          </div>
+          <span class="task-badge ${t.fixedTime ? 'badge-fixed' : 'badge-auto'}">${t.fixedTime ? '固定' : '自動'}</span>
+          <button class="task-del" data-id="${t.id}" title="刪除">✕</button>
+        </div>`;
+    }).join('');
+    el.querySelectorAll('.task-del').forEach(btn => {
+      btn.addEventListener('click', () => deleteTask(Number(btn.dataset.id)));
+    });
+  }
+
+  // ===== Render Stats =====
+  function renderStats() {
+    const dayStart = timeToMin(dayStartEl.value);
+    const dayEnd   = timeToMin(dayEndEl.value);
+    const totalMin = dayEnd - dayStart;
+    const scheduled = tasks.filter(t => t.scheduledStart);
+    const usedMin = scheduled.reduce((s,t) => s + t.duration, 0);
+    const fixedCount = tasks.filter(t => t.fixedTime !== null).length;
+    const autoCount  = tasks.filter(t => t.fixedTime === null).length;
+    const pct = totalMin > 0 ? Math.round(usedMin / totalMin * 100) : 0;
+    const freeMin = Math.max(totalMin - usedMin, 0);
+
+    document.getElementById('statTotal').textContent = `共 ${tasks.length} 項`;
+    document.getElementById('statHours').textContent = `佔用 ${(usedMin/60).toFixed(1)} 小時`;
+    document.getElementById('statFree').textContent  = `空閒 ${(freeMin/60).toFixed(1)} 小時`;
+    document.getElementById('sv1').textContent = fixedCount;
+    document.getElementById('sv2').textContent = autoCount;
+    document.getElementById('sv3').textContent = pct + '%';
+  }
+
+  // ===== Render Conflicts =====
+  function renderConflicts() {
+    const area = document.getElementById('conflictArea');
+    const conflicts = getConflicts();
+    if (conflicts.length === 0) { area.innerHTML = ''; return; }
+    area.innerHTML = `<div class="conflict-list">${conflicts.map(c=>`<div class="conflict-item">⚠️ ${escHtml(c)}</div>`).join('')}</div>`;
+  }
+
+  // ===== Master render =====
+  function rescheduleAndRender() {
+    schedule();
+    renderTimeline();
+    renderTaskList();
+    renderStats();
+    renderConflicts();
+  }
+
+  // ===== Add Task =====
+  document.getElementById('taskDuration').addEventListener('change', function() {
+    document.getElementById('customDurGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  document.getElementById('btnAdd').addEventListener('click', () => {
+    const name = document.getElementById('taskName').value.trim();
+    const timeVal = document.getElementById('taskTime').value;
+    const durSel  = document.getElementById('taskDuration').value;
+    const color   = document.getElementById('taskColor').value;
+
+    if (!name) { toast('請輸入項目名稱', 'error'); return; }
+
+    let duration;
+    if (durSel === 'custom') {
+      duration = parseInt(document.getElementById('customDur').value);
+      if (!duration || duration < 5) { toast('請輸入有效的分鐘數（至少 5 分鐘）', 'error'); return; }
+    } else {
+      duration = parseInt(durSel);
+    }
+
+    // Validate time range
+    const dayStart = timeToMin(dayStartEl.value);
+    const dayEnd   = timeToMin(dayEndEl.value);
+    if (timeVal) {
+      const s = timeToMin(timeVal);
+      if (s < dayStart || s + duration > dayEnd) {
+        toast(`指定時間超出一天範圍 (${dayStartEl.value}–${dayEndEl.value})`, 'error');
+        return;
+      }
+    }
+
+    tasks.push({ id: nextId++, name, fixedTime: timeVal || null, duration, color, scheduledStart: null, scheduledEnd: null, _col: 0, _totalCols: 1 });
+    save();
+
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskTime').value = '';
+    document.getElementById('taskDuration').value = '60';
+    document.getElementById('customDur').value = '';
+    document.getElementById('customDurGroup').style.display = 'none';
+
+    rescheduleAndRender();
+    toast(`「${name}」已加入行程`, 'success');
+  });
+
+  // Enter key submits
+  document.getElementById('taskName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btnAdd').click();
+  });
+
+  // ===== Delete Task =====
+  function deleteTask(id) {
+    const t = tasks.find(t => t.id === id);
+    tasks = tasks.filter(t => t.id !== id);
+    save();
+    rescheduleAndRender();
+    if (t) toast(`「${t.name}」已刪除`, '');
+  }
+
+  // ===== Clear All =====
+  document.getElementById('btnClear').addEventListener('click', () => {
+    if (tasks.length === 0) return;
+    if (!confirm('確定要清除所有行程嗎？')) return;
+    tasks = [];
+    save();
+    rescheduleAndRender();
+    toast('已清除所有行程', '');
+  });
+
+  // ===== Toast =====
+  function toast(msg, type = '') {
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  // ===== Escape HTML =====
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ===== Today label =====
+  (function() {
+    const d = new Date();
+    const weekDays = ['日','一','二','三','四','五','六'];
+    document.getElementById('todayLabel').textContent =
+      `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} 星期${weekDays[d.getDay()]}`;
+  })();
+
+  // ===== Init =====
+  rescheduleAndRender();
+
+  // Update now-line every minute
+  setInterval(() => {
+    rescheduleAndRender();
+  }, 60000);
+</script>
+</body>
+</html>
