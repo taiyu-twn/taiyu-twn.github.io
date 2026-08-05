@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>註冊 — 修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container" style="max-width:480px">
+  <div class="card">
+    <h2 style="margin-bottom:1.5rem">建立帳號</h2>
+    <div id="alertBox" style="display:none"></div>
+
+    <!-- Step 1: 填寫資料 -->
+    <div id="step1">
+      <div class="form-group">
+        <label>真實姓名</label>
+        <input type="text" id="realName" required>
+        <div class="field-error" id="e_name"></div>
+      </div>
+      <div class="form-group">
+        <label>身分證字號</label>
+        <input type="text" id="idNumber" placeholder="A123456789" maxlength="10">
+        <div class="field-error" id="e_id"></div>
+      </div>
+      <div class="form-group">
+        <label>手機號碼</label>
+        <input type="tel" id="phone" placeholder="09xxxxxxxx">
+        <div class="field-error" id="e_phone"></div>
+      </div>
+      <div class="form-group">
+        <label>密碼（至少 8 字元）</label>
+        <input type="password" id="password">
+        <div class="field-error" id="e_pwd"></div>
+      </div>
+      <div class="form-group">
+        <label>確認密碼</label>
+        <input type="password" id="password2">
+        <div class="field-error" id="e_pwd2"></div>
+      </div>
+      <button id="sendOtpBtn" class="btn btn-green" style="width:100%">發送簡訊驗證碼</button>
+      <p style="margin-top:1rem;text-align:center">已有帳號？<a href="/修法王/public/login.html">登入</a></p>
+    </div>
+
+    <!-- Step 2: 輸入 OTP -->
+    <div id="step2" style="display:none">
+      <p style="margin-bottom:1rem">驗證碼已發送至 <strong id="phoneDisplay"></strong>，請在 10 分鐘內輸入。</p>
+      <div id="testModeNote" style="display:none" class="alert-success" style="margin-bottom:1rem">⚙️ 測試模式：驗證碼為 <strong>123456</strong></div>
+      <div class="form-group">
+        <label>驗證碼</label>
+        <input type="text" id="otp" maxlength="6" placeholder="6 位數字" autofocus>
+        <div class="field-error" id="e_otp"></div>
+      </div>
+      <button id="verifyBtn" class="btn btn-green" style="width:100%">驗證並完成註冊</button>
+    </div>
+  </div>
+</div>
+
+<script>
+injectLayout('註冊帳號');
+if (isLoggedIn()) location.href = '/修法王/public/index.html';
+
+document.getElementById('sendOtpBtn').onclick = async () => {
+  const name  = document.getElementById('realName').value.trim();
+  const id    = document.getElementById('idNumber').value.toUpperCase().trim();
+  const phone = document.getElementById('phone').value.trim();
+  const pwd   = document.getElementById('password').value;
+  const pwd2  = document.getElementById('password2').value;
+
+  let valid = true;
+  const err = (id, msg) => { document.getElementById(id).textContent = msg; if (msg) valid = false; };
+  err('e_name',  !name ? '請填寫真實姓名' : '');
+  err('e_id',    !/^[A-Z][12]\d{8}$/.test(id) ? '身分證字號格式不正確' : '');
+  err('e_phone', !/^09\d{8}$/.test(phone) ? '手機號碼格式不正確' : '');
+  err('e_pwd',   pwd.length < 8 ? '密碼至少 8 個字元' : '');
+  err('e_pwd2',  pwd !== pwd2 ? '兩次密碼不一致' : '');
+  if (!valid) return;
+
+  const btn = document.getElementById('sendOtpBtn');
+  btn.disabled = true; btn.textContent = '發送中...';
+
+  const r = await api('sendOTP', { phone });
+  if (r.status === 'success') {
+    sessionStorage.setItem('reg_name', name);
+    sessionStorage.setItem('reg_id',   document.getElementById('idNumber').value.toUpperCase().trim());
+    sessionStorage.setItem('reg_phone', phone);
+    sessionStorage.setItem('reg_pwd',  pwd);
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('phoneDisplay').textContent = phone;
+    if (r.testMode) document.getElementById('testModeNote').style.display = 'block';
+  } else {
+    showMsg(document.getElementById('alertBox'), r.msg || '簡訊發送失敗', 'error');
+    btn.disabled = false; btn.textContent = '發送簡訊驗證碼';
+  }
+};
+
+document.getElementById('verifyBtn').onclick = async () => {
+  const otp   = document.getElementById('otp').value.trim();
+  const phone = sessionStorage.getItem('reg_phone');
+  if (!otp) { document.getElementById('e_otp').textContent = '請輸入驗證碼'; return; }
+
+  const btn = document.getElementById('verifyBtn');
+  btn.disabled = true; btn.textContent = '驗證中...';
+
+  const r = await api('register', {
+    realName: sessionStorage.getItem('reg_name'),
+    idNumber: sessionStorage.getItem('reg_id'),
+    phone,
+    password: sessionStorage.getItem('reg_pwd'),
+    otp
+  });
+
+  if (r.status === 'success') {
+    saveSession(r);
+    ['reg_name','reg_id','reg_phone','reg_pwd'].forEach(k => sessionStorage.removeItem(k));
+    location.href = '/修法王/public/index.html';
+  } else {
+    document.getElementById('e_otp').textContent = r.msg || '驗證失敗';
+    btn.disabled = false; btn.textContent = '驗證並完成註冊';
+  }
+};
+</script>
+</body>
+</html>

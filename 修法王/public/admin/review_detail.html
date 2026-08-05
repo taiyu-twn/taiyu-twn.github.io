@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>審核詳情 — 修法王後台</title>
+<script src="/修法王/public/js/app.js"></script>
+<style>
+body{font-family:'Noto Sans TC',sans-serif;background:#f4f6f8}
+.sidebar{width:200px;background:#2c3e50;min-height:100vh;position:fixed;top:0;left:0;padding:1.5rem 0}
+.sidebar h2{color:#fff;text-align:center;font-size:1.1rem;margin-bottom:1.5rem;padding:0 1rem}
+.sidebar a{display:block;color:#ccc;padding:.7rem 1.5rem;text-decoration:none}
+.sidebar a:hover{background:#34495e;color:#fff}
+.main{margin-left:200px;padding:2rem}
+.card{background:#fff;border-radius:8px;padding:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:1.5rem}
+.btn{display:inline-block;padding:.5rem 1.2rem;border-radius:6px;border:none;cursor:pointer;font-size:.9rem;font-family:inherit;text-decoration:none}
+.btn-green{background:#2ecc71;color:#fff}.btn-red{background:#e74c3c;color:#fff}.btn-gray{background:#95a5a6;color:#fff}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.8rem;font-weight:700}
+.badge-pending{background:#fff3cd;color:#856404}.badge-approved{background:#d4edda;color:#155724}
+.badge-rejected{background:#f8d7da;color:#721c24}.badge-hidden{background:#dee2e6;color:#495057}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:8px;padding:2rem;max-width:480px;width:90%}
+textarea{width:100%;padding:.6rem;border:1px solid #ccc;border-radius:6px;font-size:.9rem;font-family:inherit}
+.alert{padding:.8rem;border-radius:6px;margin-bottom:1rem}
+.alert-success{background:#d4edda;color:#155724}
+.alert-error{background:#f8d7da;color:#721c24}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>⚖️ 修法王後台</h2>
+  <a href="/修法王/public/admin/index.html">📊 總覽</a>
+  <a href="/修法王/public/admin/review.html">📋 審核管理</a>
+  <a href="#" onclick="localStorage.removeItem('lrk_admin_token');location.href='/修法王/public/admin/index.html'">🚪 登出</a>
+</div>
+<div class="main" id="main">
+  <div style="text-align:center;padding:3rem"><span class="spinner" style="width:30px;height:30px;border-width:4px"></span></div>
+</div>
+
+<!-- 拒絕 Modal -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <h3 style="margin-bottom:1rem">填寫拒絕原因</h3>
+    <textarea id="rejectReason" rows="4" placeholder="請填寫具體原因（將寄給參賽者）"></textarea>
+    <div style="display:flex;gap:1rem;margin-top:1rem">
+      <button id="confirmRejectBtn" class="btn btn-red">確認拒絕</button>
+      <button class="btn btn-gray" onclick="document.getElementById('rejectModal').classList.remove('active')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 照片放大 Modal -->
+<div class="modal-overlay" id="imgModal" onclick="this.classList.remove('active')">
+  <img id="imgSrc" src="" style="max-width:90%;max-height:90%;border-radius:8px" alt="">
+</div>
+
+<script>
+const style2 = document.createElement('style');
+style2.textContent = `.spinner{display:inline-block;border:4px solid #f3f3f3;border-top:4px solid #2ecc71;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}`;
+document.head.appendChild(style2);
+
+if (!isAdmin()) location.href = '/修法王/public/admin/index.html';
+
+const subId    = new URLSearchParams(location.search).get('id');
+const catLabel = { general:'一般大眾', streamer:'直播主', student:'在校學生' };
+
+function driveThumb(fileId) {
+  return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w400` : '';
+}
+
+let currentRow = null;
+
+async function loadDetail() {
+  const r = await api('adminDetail', { id: subId });
+  if (r.status !== 'success') { document.getElementById('main').innerHTML = '<p>找不到資料。</p>'; return; }
+  currentRow = r.row;
+  render(r.row, r.votes);
+}
+
+function render(row, votes) {
+  const embed = ytEmbed(row.video_url);
+  const idPhotoUrl      = driveThumb(row.id_photo_drive_id);
+  const studentPhotoUrl = driveThumb(row.student_photo_drive_id);
+
+  document.getElementById('main').innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3>${escHtml(row.team_name)}</h3>
+        <a href="/修法王/public/admin/review.html" class="btn btn-gray">← 返回列表</a>
+      </div>
+      <div id="actionMsg"></div>
+
+      <table style="width:auto;margin-bottom:1.5rem;border-collapse:collapse">
+        ${[
+          ['狀態',     `<span class="badge badge-${row.status}">${row.status}</span>`],
+          ['組員人數', row.member_count],
+          ['聯絡人',   escHtml(row.contact_name)],
+          ['電話',     escHtml(row.phone)],
+          ['Email',    escHtml(row.email)],
+          ['參賽身分', catLabel[row.category] || row.category],
+          ['票數',     numFmt(votes)],
+          ['報名時間', row.submitted_at?.slice(0,16)],
+          ['審核時間', row.reviewed_at?.slice(0,16) || '—'],
+          ['拒絕原因', escHtml(row.reject_reason || '—')],
+        ].map(([l,v]) => `<tr><th style="text-align:right;padding:.4rem 1rem .4rem 0;color:#555;white-space:nowrap;font-weight:600">${l}：</th><td>${v}</td></tr>`).join('')}
+      </table>
+
+      ${embed ? `
+      <h4 style="margin-bottom:.5rem">影片預覽</h4>
+      <div style="max-width:560px;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin-bottom:1.5rem">
+        <iframe src="${embed}" style="position:absolute;top:0;left:0;width:100%;height:100%" frameborder="0" allowfullscreen></iframe>
+      </div>` : ''}
+
+      ${idPhotoUrl ? `
+      <h4 style="margin-bottom:.5rem">身分證照片</h4>
+      <img src="${idPhotoUrl}" style="max-width:300px;border-radius:6px;cursor:zoom-in;margin-bottom:1rem" onclick="openImg(this.src)" alt="身分證">` : ''}
+
+      ${studentPhotoUrl ? `
+      <h4 style="margin-bottom:.5rem">學生證照片</h4>
+      <img src="${studentPhotoUrl}" style="max-width:300px;border-radius:6px;cursor:zoom-in;margin-bottom:1rem" onclick="openImg(this.src)" alt="學生證">` : ''}
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem" id="actionBtns">
+        ${(row.status==='pending'||row.status==='rejected') ? `<button class="btn btn-green" onclick="doAction('approve')">✅ 通過</button>` : ''}
+        ${(row.status==='pending'||row.status==='approved') ? `<button class="btn btn-red" onclick="document.getElementById('rejectModal').classList.add('active')">❌ 不通過</button>` : ''}
+        ${row.status==='approved' ? `<button class="btn btn-gray" onclick="doAction('hide')">🚫 下架</button>` : ''}
+      </div>
+    </div>`;
+}
+
+async function doAction(type) {
+  if (type === 'approve' && !confirm('確認通過此報名？')) return;
+  if (type === 'hide'    && !confirm('確認下架此影片？')) return;
+  const r = await api(`admin${type.charAt(0).toUpperCase()+type.slice(1)}`, { id: subId });
+  const el = document.getElementById('actionMsg');
+  if (r.status === 'success') {
+    el.className = 'alert alert-success';
+    el.textContent = type==='approve' ? '✅ 已通過審核' : '🚫 已下架';
+    loadDetail();
+  } else {
+    el.className = 'alert alert-error';
+    el.textContent = '❌ ' + (r.msg || '操作失敗');
+  }
+}
+
+document.getElementById('confirmRejectBtn').onclick = async () => {
+  const reason = document.getElementById('rejectReason').value.trim();
+  if (!reason) { alert('請填寫拒絕原因'); return; }
+  document.getElementById('rejectModal').classList.remove('active');
+  const r = await api('adminReject', { id: subId, reason });
+  const el = document.getElementById('actionMsg');
+  if (r.status === 'success') {
+    el.className = 'alert alert-success';
+    el.textContent = '❌ 已拒絕並通知參賽者';
+    loadDetail();
+  } else {
+    el.className = 'alert alert-error';
+    el.textContent = r.msg || '操作失敗';
+  }
+};
+
+function openImg(src) {
+  document.getElementById('imgSrc').src = src;
+  document.getElementById('imgModal').classList.add('active');
+}
+
+loadDetail();
+</script>
+</body>
+</html>

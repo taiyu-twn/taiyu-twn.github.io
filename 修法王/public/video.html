@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影片 — 修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container" style="max-width:800px" id="app">
+  <div style="text-align:center;padding:3rem"><span class="spinner"></span></div>
+</div>
+
+<script>
+injectLayout();
+const videoId = new URLSearchParams(location.search).get('id');
+
+async function loadVideo() {
+  if (!videoId) { location.href = '/修法王/public/videos.html'; return; }
+  const r = await api('getVideo', { videoId });
+  if (r.status !== 'success') { document.getElementById('app').innerHTML = '<div class="card"><p>找不到影片。</p><a href="/修法王/public/videos.html">回列表</a></div>'; return; }
+
+  const v       = r.video;
+  const pageUrl = location.href;
+  const qrUrl   = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${encodeURIComponent(pageUrl)}`;
+
+  document.title = `${v.teamName} — 修法王`;
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <h1 style="margin-bottom:1rem">${escHtml(v.teamName)}</h1>
+
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin-bottom:1.5rem">
+        <iframe src="${ytEmbed(v.videoUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%"
+                frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+        <span id="voteCount" style="font-size:1.4rem;color:var(--green);font-weight:700">🗳️ ${numFmt(v.votes)} 票</span>
+        <span class="badge ${v.category==='student'?'badge-green':'badge-blue'}">${categoryLabel(v.category)}</span>
+      </div>
+
+      ${v.igUrl ? `<a href="${escHtml(v.igUrl)}" target="_blank" rel="noopener" class="btn btn-ig" style="margin-bottom:1rem">📷 前往 Instagram 觀看</a>` : ''}
+
+      <div id="voteArea">
+        ${isLoggedIn()
+          ? `<button id="voteBtn" class="btn btn-green" style="font-size:1.1rem;padding:.8rem 2rem">投票支持</button>
+             <div id="voteMsg" style="margin-top:.8rem;font-weight:600"></div>`
+          : `<a href="/修法王/public/login.html?redirect=${encodeURIComponent(location.href)}" class="btn btn-green">登入後投票</a>`}
+      </div>
+
+      <hr style="margin:1.5rem 0">
+
+      <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <h4>分享此影片</h4>
+          <p style="margin:.5rem 0;word-break:break-all;font-size:.85rem;color:#666">${escHtml(pageUrl)}</p>
+          <button onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='已複製！')" class="btn btn-outline">複製連結</button>
+        </div>
+        <div>
+          <h4>QR Code</h4>
+          <img src="${qrUrl}" alt="QR Code" style="width:150px;height:150px">
+        </div>
+      </div>
+    </div>`;
+
+  // 投票邏輯
+  const voteBtn = document.getElementById('voteBtn');
+  if (!voteBtn) return;
+
+  async function doVote() {
+    voteBtn.disabled = true;
+    const res  = await api('vote', { videoId });
+    const msg  = document.getElementById('voteMsg');
+    if (res.status === 'success') {
+      msg.style.color = 'var(--green)';
+      msg.textContent = `✅ 投票成功！目前 ${numFmt(res.newCount)} 票`;
+      document.getElementById('voteCount').textContent = `🗳️ ${numFmt(res.newCount)} 票`;
+    } else if (res.status === 'already_voted') {
+      msg.style.color = '#e67e22';
+      msg.textContent = `⏰ ${res.msg}`;
+      voteBtn.disabled = false;
+    } else {
+      msg.style.color = 'var(--red)';
+      msg.textContent = `❌ ${res.msg || '投票失敗'}`;
+      voteBtn.disabled = false;
+    }
+  }
+
+  const signModal = buildSignModal(doVote);
+
+  voteBtn.onclick = () => {
+    if (!hasSigned()) {
+      signModal.classList.add('active');
+    } else {
+      doVote();
+    }
+  };
+}
+
+loadVideo();
+</script>
+</body>
+</html>

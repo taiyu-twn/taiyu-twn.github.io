@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影片列表 — 修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1 style="margin-bottom:1.5rem">🎬 參賽影片列表</h1>
+  <div id="grid"><div style="text-align:center;padding:3rem"><span class="spinner"></span></div></div>
+</div>
+
+<script>
+injectLayout('影片列表');
+
+async function loadVideos() {
+  const r = await api('getVideos');
+  const el = document.getElementById('grid');
+  if (r.status !== 'success' || !r.videos.length) {
+    el.innerHTML = '<div class="card"><p>目前尚無已審核通過的影片。</p></div>';
+    return;
+  }
+  el.innerHTML = `<div class="video-grid">` + r.videos.map((v, i) => `
+    <div class="video-card">
+      <a href="/修法王/public/video.html?id=${encodeURIComponent(v.id)}">
+        <img src="${ytThumb(v.videoUrl)}" alt="縮圖" loading="lazy">
+      </a>
+      <div class="video-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">
+          <span class="badge ${i===0?'badge-gold':v.category==='student'?'badge-green':'badge-blue'}">
+            ${i===0?'👑 ':''}#${i+1} ${categoryLabel(v.category)}
+          </span>
+          <span style="color:var(--green);font-weight:700">${numFmt(v.votes)} 票</span>
+        </div>
+        <h4 style="margin-bottom:.5rem">${escHtml(v.teamName)}</h4>
+        <a href="/修法王/public/video.html?id=${encodeURIComponent(v.id)}" class="btn btn-green" style="width:100%;text-align:center">觀看 &amp; 投票</a>
+      </div>
+    </div>`).join('') + `</div>`;
+}
+
+loadVideos();
+</script>
+</body>
+</html>

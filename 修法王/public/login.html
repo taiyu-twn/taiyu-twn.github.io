@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>登入 — 修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container" style="max-width:420px">
+  <div class="card">
+    <h2 style="margin-bottom:1.5rem">登入帳號</h2>
+    <div id="alertBox" style="display:none"></div>
+    <div class="form-group">
+      <label>手機號碼</label>
+      <input type="tel" id="phone" placeholder="09xxxxxxxx" autofocus>
+    </div>
+    <div class="form-group">
+      <label>密碼</label>
+      <input type="password" id="password">
+    </div>
+    <button id="loginBtn" class="btn btn-green" style="width:100%">登入</button>
+    <p style="margin-top:1rem;text-align:center">還沒有帳號？<a href="/修法王/public/register.html">立即註冊</a></p>
+  </div>
+</div>
+
+<script>
+injectLayout('登入');
+if (isLoggedIn()) location.href = '/修法王/public/index.html';
+
+const redirect = new URLSearchParams(location.search).get('redirect') || '/修法王/public/index.html';
+
+async function doLogin() {
+  const phone    = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = '登入中...';
+
+  const r = await api('login', { phone, password });
+  if (r.status === 'success') {
+    saveSession(r);
+    location.href = redirect;
+  } else {
+    showMsg(document.getElementById('alertBox'), r.msg || '登入失敗', 'error');
+    btn.disabled = false; btn.textContent = '登入';
+  }
+}
+
+document.getElementById('loginBtn').onclick = doLogin;
+document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

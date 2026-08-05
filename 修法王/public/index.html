@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container" id="app">
+  <div style="text-align:center;padding:3rem"><span class="spinner"></span></div>
+</div>
+
+<script>
+injectLayout('首頁');
+
+async function loadPage() {
+  const r = await api('getStats');
+  if (r.status !== 'success') { document.getElementById('app').innerHTML = '<div class="card"><p>載入失敗，請重新整理。</p></div>'; return; }
+
+  const { sigs, todayVotes, target, lawKing, publicTop4, studentTop4 } = r;
+  const pct = Math.min(100, (sigs / target * 100).toFixed(1));
+
+  function videoCard(v, rank, badgeClass) {
+    return `
+      <div class="video-card">
+        <a href="/修法王/public/video.html?id=${encodeURIComponent(v.id)}">
+          <img src="${ytThumb(v.videoUrl)}" alt="影片縮圖" loading="lazy">
+        </a>
+        <div class="video-card-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">
+            <span class="badge ${badgeClass}">#${rank} ${categoryLabel(v.category)}</span>
+            <span style="color:var(--green);font-weight:700">${numFmt(v.votes)} 票</span>
+          </div>
+          <h4 style="margin-bottom:.5rem">${escHtml(v.teamName)}</h4>
+          <a href="/修法王/public/video.html?id=${encodeURIComponent(v.id)}" class="btn btn-green" style="width:100%;text-align:center">觀看 &amp; 投票</a>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('app').innerHTML = `
+    <!-- Hero -->
+    <div class="card" style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;text-align:center;padding:3rem 2rem">
+      <h1 style="font-size:2.5rem;margin-bottom:1rem">⚖️ 修法王</h1>
+      <p style="font-size:1.1rem;opacity:.9;max-width:600px;margin:0 auto 1.5rem">
+        推動兒少性侵追訴期修法——用影片讓聲音被聽見，用連署讓改變發生。
+      </p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="/修法王/public/apply.html" class="btn btn-green">我要參賽</a>
+        <a href="/修法王/public/petition.html" class="btn btn-gold">立即連署</a>
+        <a href="/修法王/public/videos.html" class="btn" style="background:transparent;border:2px solid #fff;color:#fff">觀看影片 &amp; 投票</a>
+      </div>
+    </div>
+
+    <!-- 連署進度 -->
+    <div class="card">
+      <h2>📜 連署進度</h2>
+      <p style="margin:.5rem 0">目前已有 <strong style="color:var(--green);font-size:1.3rem">${numFmt(sigs)}</strong> 人連署（目標 ${numFmt(target)} 人）</p>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <p style="color:#666;font-size:.85rem">${pct}% 達成</p>
+      <a href="/修法王/public/petition.html" class="btn btn-green" style="margin-top:.5rem">加入連署</a>
+    </div>
+
+    <!-- 修法王 -->
+    ${lawKing ? `
+    <div class="card" style="border:3px solid var(--gold)">
+      <h2>👑 修法王</h2>
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem">
+        <img src="${ytThumb(lawKing.videoUrl)}" style="width:200px;border-radius:8px" alt="">
+        <div>
+          <h3 style="font-size:1.4rem">${escHtml(lawKing.teamName)}</h3>
+          <p style="color:var(--gold);font-size:1.2rem;margin:.3rem 0">🏆 ${numFmt(lawKing.votes)} 票</p>
+          <a href="/修法王/public/video.html?id=${encodeURIComponent(lawKing.id)}" class="btn btn-gold" style="margin-top:.5rem">觀看 &amp; 投票</a>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <!-- 社會大眾守護王 -->
+    ${publicTop4.length ? `
+    <div class="card">
+      <h2>🛡️ 社會大眾組守護王 TOP 4</h2>
+      <div class="video-grid" style="margin-top:1rem">
+        ${publicTop4.map((v, i) => videoCard(v, i+1, 'badge-blue')).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- 校園學生守護王 -->
+    ${studentTop4.length ? `
+    <div class="card">
+      <h2>🎓 校園學生組守護王 TOP 4</h2>
+      <div class="video-grid" style="margin-top:1rem">
+        ${studentTop4.map((v, i) => videoCard(v, i+1, 'badge-green')).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+loadPage();
+</script>
+</body>
+</html>

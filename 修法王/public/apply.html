@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我要報名 — 修法王</title>
+<script src="/修法王/public/js/app.js"></script>
+</head>
+<body>
+<div class="container" style="max-width:680px">
+  <div class="card">
+    <h1 style="margin-bottom:1.5rem">⚖️ 修法王活動報名</h1>
+    <div id="successMsg" style="display:none" class="alert-success">
+      <h2>🎉 報名成功！</h2>
+      <p>我們將在 3 個工作天內完成審核，審核結果將寄到您的 Email。</p>
+      <a href="/修法王/public/index.html" class="btn btn-green" style="margin-top:1rem">回首頁</a>
+    </div>
+    <div id="formArea">
+      <div id="alertBox" style="display:none"></div>
+
+      <div class="form-group">
+        <label>組名 *</label>
+        <input type="text" id="teamName" required>
+        <div class="field-error" id="e_team"></div>
+      </div>
+      <div class="form-group">
+        <label>組員人數 *</label>
+        <select id="memberCount">
+          <option value="1">1 人</option><option value="2">2 人</option>
+          <option value="3">3 人</option><option value="4">4 人</option><option value="5">5 人</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>聯絡人姓名 *</label>
+        <input type="text" id="contactName" required>
+        <div class="field-error" id="e_contact"></div>
+      </div>
+      <div class="form-group">
+        <label>身分證字號 * <small style="color:#666">（送出後將加密儲存）</small></label>
+        <input type="text" id="idNumber" placeholder="A123456789" maxlength="10">
+        <div class="field-error" id="e_id"></div>
+      </div>
+      <div class="form-group">
+        <label>聯絡電話 *</label>
+        <input type="tel" id="phone" placeholder="09xxxxxxxx">
+        <div class="field-error" id="e_phone"></div>
+      </div>
+      <div class="form-group">
+        <label>聯絡 Email *</label>
+        <input type="email" id="email">
+        <div class="field-error" id="e_email"></div>
+      </div>
+      <div class="form-group">
+        <label>YouTube Shorts 影片網址 *</label>
+        <input type="url" id="videoUrl" placeholder="https://www.youtube.com/shorts/...">
+        <div class="field-error" id="e_url"></div>
+        <img id="ytPreview" src="" style="width:200px;border-radius:6px;margin-top:.5rem;display:none" alt="預覽">
+      </div>
+      <div class="form-group">
+        <label>Instagram 貼文／Reels 網址 <small style="color:#666">（選填）</small></label>
+        <input type="url" id="igUrl" placeholder="https://www.instagram.com/reel/...">
+        <small style="color:#666">填寫後，投票頁會顯示「前往 Instagram 觀看」按鈕</small>
+        <div class="field-error" id="e_ig"></div>
+      </div>
+      <div class="form-group">
+        <label>社群平台帳號 ID <small style="color:#666">（選填）</small></label>
+        <input type="text" id="platformId">
+      </div>
+      <div class="form-group">
+        <label>參賽身分 *</label>
+        <label style="font-weight:normal;display:flex;gap:.5rem;margin:.3rem 0"><input type="radio" name="category" value="general"> 一般大眾</label>
+        <label style="font-weight:normal;display:flex;gap:.5rem;margin:.3rem 0"><input type="radio" name="category" value="streamer"> 直播主</label>
+        <label style="font-weight:normal;display:flex;gap:.5rem;margin:.3rem 0"><input type="radio" name="category" value="student"> 在校學生</label>
+        <div class="field-error" id="e_cat"></div>
+      </div>
+      <div id="studentFields" style="display:none">
+        <div class="form-group">
+          <label>學校名稱 *</label>
+          <input type="text" id="school">
+        </div>
+        <div class="form-group">
+          <label>學號 *</label>
+          <input type="text" id="studentId">
+        </div>
+        <div class="form-group">
+          <label>學生證照片 * <small style="color:#666">（jpg/png，限5MB）</small></label>
+          <input type="file" id="studentPhoto" accept="image/jpeg,image/png">
+          <div class="field-error" id="e_spho"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>身分證正反面照片 * <small style="color:#666">（jpg/png，限5MB）</small></label>
+        <input type="file" id="idPhoto" accept="image/jpeg,image/png" required>
+        <div class="field-error" id="e_ipho"></div>
+      </div>
+
+      <button id="submitBtn" class="btn btn-green" style="font-size:1rem;padding:.8rem 2rem">送出報名</button>
+    </div>
+  </div>
+</div>
+
+<script>
+injectLayout('我要報名');
+
+// 學生欄位切換
+document.querySelectorAll('input[name=category]').forEach(r =>
+  r.addEventListener('change', () => {
+    document.getElementById('studentFields').style.display = r.value === 'student' && r.checked ? 'block' : 'none';
+  })
+);
+
+// YouTube 即時預覽
+document.getElementById('videoUrl').addEventListener('input', function() {
+  const id  = ytVideoId(this.value.trim());
+  const img = document.getElementById('ytPreview');
+  if (id) { img.src = ytThumb(this.value); img.style.display = 'block'; }
+  else img.style.display = 'none';
+});
+
+// 讀取圖片為 base64
+function readFileAsBase64(file) {
+  return new Promise((res, rej) => {
+    if (file.size > 5 * 1024 * 1024) { rej(new Error('照片大小不得超過 5MB')); return; }
+    if (!['image/jpeg','image/png'].includes(file.type)) { rej(new Error('只接受 JPG 或 PNG 格式')); return; }
+    const reader = new FileReader();
+    reader.onload  = () => res(reader.result);
+    reader.onerror = () => rej(new Error('讀取照片失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('submitBtn').onclick = async () => {
+  const get = id => document.getElementById(id).value.trim();
+  const err = (id, msg) => { document.getElementById(id).textContent = msg; };
+
+  // 清空錯誤
+  ['e_team','e_contact','e_id','e_phone','e_email','e_url','e_ig','e_cat','e_ipho','e_spho'].forEach(id => err(id, ''));
+
+  const teamName    = get('teamName');
+  const contactName = get('contactName');
+  const idNumber    = document.getElementById('idNumber').value.toUpperCase().trim();
+  const phone       = get('phone');
+  const email       = get('email');
+  const videoUrl    = get('videoUrl');
+  const igUrl       = get('igUrl');
+  const platformId  = get('platformId');
+  const category    = document.querySelector('input[name=category]:checked')?.value || '';
+  const school      = get('school');
+  const studentId   = get('studentId');
+
+  let valid = true;
+  const fail = (id, msg) => { err(id, msg); valid = false; };
+
+  if (!teamName)    fail('e_team',    '請填寫組名');
+  if (!contactName) fail('e_contact', '請填寫聯絡人姓名');
+  if (!/^[A-Z][12]\d{8}$/.test(idNumber)) fail('e_id', '身分證字號格式不正確');
+  if (!/^09\d{8}$/.test(phone)) fail('e_phone', '手機號碼格式不正確');
+  if (!email.includes('@')) fail('e_email', 'Email 格式不正確');
+  if (!ytVideoId(videoUrl)) fail('e_url', '請輸入有效的 YouTube 網址');
+  if (igUrl && !/^https:\/\/(www\.)?instagram\.com\/(p|reel|tv)\/[\w\-]+/.test(igUrl)) fail('e_ig', 'Instagram 網址格式不正確');
+  if (!category) fail('e_cat', '請選擇參賽身分');
+  if (category === 'student' && (!school || !studentId)) fail('e_cat', '學生參賽者請填寫學校與學號');
+
+  const idPhotoFile = document.getElementById('idPhoto').files[0];
+  if (!idPhotoFile) fail('e_ipho', '請上傳身分證照片');
+
+  let studentPhotoFile = null;
+  if (category === 'student') {
+    studentPhotoFile = document.getElementById('studentPhoto').files[0];
+    if (!studentPhotoFile) fail('e_spho', '請上傳學生證照片');
+  }
+
+  if (!valid) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '上傳中...';
+
+  let idPhotoBase64 = '', studentPhotoBase64 = '';
+  try {
+    idPhotoBase64 = await readFileAsBase64(idPhotoFile);
+    if (studentPhotoFile) studentPhotoBase64 = await readFileAsBase64(studentPhotoFile);
+  } catch (e) {
+    showMsg(document.getElementById('alertBox'), e.message, 'error');
+    btn.disabled = false; btn.textContent = '送出報名'; return;
+  }
+
+  btn.textContent = '送出中...';
+  const r = await api('apply', {
+    teamName, memberCount: document.getElementById('memberCount').value,
+    contactName, idNumber, phone, email, videoUrl, igUrl, platformId,
+    category, school, studentId, idPhotoBase64, studentPhotoBase64
+  });
+
+  if (r.status === 'success') {
+    document.getElementById('formArea').style.display  = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  } else {
+    showMsg(document.getElementById('alertBox'), r.msg || '報名失敗，請稍後再試', 'error');
+    btn.disabled = false; btn.textContent = '送出報名';
+  }
+};
+</script>
+</body>
+</html>

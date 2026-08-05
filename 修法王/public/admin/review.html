@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>審核管理 — 修法王後台</title>
+<script src="/修法王/public/js/app.js"></script>
+<style>
+body{font-family:'Noto Sans TC',sans-serif;background:#f4f6f8}
+.sidebar{width:200px;background:#2c3e50;min-height:100vh;position:fixed;top:0;left:0;padding:1.5rem 0}
+.sidebar h2{color:#fff;text-align:center;font-size:1.1rem;margin-bottom:1.5rem;padding:0 1rem}
+.sidebar a{display:block;color:#ccc;padding:.7rem 1.5rem;text-decoration:none}
+.sidebar a:hover{background:#34495e;color:#fff}
+.main{margin-left:200px;padding:2rem}
+.card{background:#fff;border-radius:8px;padding:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:.7rem 1rem;border-bottom:1px solid #eee;font-size:.9rem}
+th{background:#f8f9fa;font-weight:600}
+.btn{display:inline-block;padding:.4rem .9rem;border-radius:6px;border:none;cursor:pointer;font-size:.85rem;text-decoration:none;font-family:inherit}
+.btn-green{background:#2ecc71;color:#fff}.btn-gray{background:#95a5a6;color:#fff}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.75rem;font-weight:700}
+.badge-pending{background:#fff3cd;color:#856404}
+.badge-approved{background:#d4edda;color:#155724}
+.badge-rejected{background:#f8d7da;color:#721c24}
+.badge-hidden{background:#dee2e6;color:#495057}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>⚖️ 修法王後台</h2>
+  <a href="/修法王/public/admin/index.html">📊 總覽</a>
+  <a href="/修法王/public/admin/review.html">📋 審核管理</a>
+  <a href="#" onclick="localStorage.removeItem('lrk_admin_token');location.href='/修法王/public/admin/index.html'">🚪 登出</a>
+</div>
+<div class="main">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem">
+      <h3>報名列表</h3>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="filterBtns"></div>
+    </div>
+    <div id="tableWrap"><div style="text-align:center;padding:2rem"><span class="spinner" style="width:24px;height:24px;border-width:4px"></span></div></div>
+  </div>
+</div>
+
+<script>
+const style2 = document.createElement('style');
+style2.textContent = `.spinner{display:inline-block;border:4px solid #f3f3f3;border-top:4px solid #2ecc71;border-radius:50%;width:24px;height:24px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}`;
+document.head.appendChild(style2);
+
+if (!isAdmin()) location.href = '/修法王/public/admin/index.html';
+
+const catLabel = { general:'一般大眾', streamer:'直播主', student:'在校學生' };
+let currentFilter = new URLSearchParams(location.search).get('status') || 'all';
+
+const filters = { all:'全部', pending:'待審', approved:'通過', rejected:'拒絕', hidden:'下架' };
+
+function renderFilterBtns() {
+  document.getElementById('filterBtns').innerHTML = Object.entries(filters).map(([v, l]) =>
+    `<button class="btn ${currentFilter===v?'btn-green':'btn-gray'}" onclick="loadList('${v}')">${l}</button>`
+  ).join('');
+}
+
+async function loadList(filter) {
+  currentFilter = filter;
+  renderFilterBtns();
+  document.getElementById('tableWrap').innerHTML = '<div style="text-align:center;padding:2rem"><span class="spinner"></span></div>';
+  const r = await api('adminList', { filter });
+  if (r.status !== 'success' || !r.rows.length) {
+    document.getElementById('tableWrap').innerHTML = '<p style="color:#666;padding:1rem">沒有符合的記錄。</p>';
+    return;
+  }
+  document.getElementById('tableWrap').innerHTML = `
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>組名</th><th>報名時間</th><th>參賽身分</th><th>影片</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody>
+      ${r.rows.map(row => `
+        <tr>
+          <td>${escHtml(row.team_name)}</td>
+          <td style="white-space:nowrap">${row.submitted_at.slice(0,16)}</td>
+          <td>${catLabel[row.category] || row.category}</td>
+          <td><a href="${escHtml(row.video_url)}" target="_blank" rel="noopener">YouTube ↗</a></td>
+          <td><span class="badge badge-${row.status}">${row.status}</span></td>
+          <td><a href="/修法王/public/admin/review_detail.html?id=${encodeURIComponent(row.id)}" class="btn btn-green">審核</a></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>`;
+}
+
+renderFilterBtns();
+loadList(currentFilter);
+</script>
+</body>
+</html>

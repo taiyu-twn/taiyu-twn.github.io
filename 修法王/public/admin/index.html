@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>修法王後台</title>
+<script src="/修法王/public/js/app.js"></script>
+<style>
+body{font-family:'Noto Sans TC',sans-serif;background:#f4f6f8}
+.sidebar{width:200px;background:#2c3e50;min-height:100vh;position:fixed;top:0;left:0;padding:1.5rem 0}
+.sidebar h2{color:#fff;text-align:center;font-size:1.1rem;margin-bottom:1.5rem;padding:0 1rem}
+.sidebar a{display:block;color:#ccc;padding:.7rem 1.5rem;text-decoration:none}
+.sidebar a:hover{background:#34495e;color:#fff}
+.main{margin-left:200px;padding:2rem}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:#fff;border-radius:8px;padding:1.2rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.stat-card .num{font-size:2rem;font-weight:700;color:#2ecc71}
+.stat-card .lbl{color:#666;font-size:.85rem}
+/* 登入畫面 */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-card{background:#fff;border-radius:10px;padding:2.5rem;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+input{width:100%;padding:.6rem;border:1px solid #ccc;border-radius:6px;margin-bottom:1rem;font-size:.95rem}
+.btn{padding:.8rem;background:#2ecc71;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;font-size:1rem}
+.err{color:#e74c3c;margin-bottom:.5rem;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<!-- 登入畫面 -->
+<div class="login-wrap" id="loginArea">
+  <div class="login-card">
+    <h2 style="text-align:center;margin-bottom:1.5rem">⚖️ 修法王後台</h2>
+    <div class="err" id="loginErr" style="display:none"></div>
+    <input type="password" id="adminPwd" placeholder="管理員密碼">
+    <button class="btn" id="loginBtn">登入</button>
+  </div>
+</div>
+
+<!-- 後台主體 -->
+<div id="adminArea" style="display:none">
+  <div class="sidebar">
+    <h2>⚖️ 修法王後台</h2>
+    <a href="/修法王/public/admin/index.html">📊 總覽</a>
+    <a href="/修法王/public/admin/review.html">📋 審核管理</a>
+    <a href="#" id="logoutLink">🚪 登出</a>
+  </div>
+  <div class="main">
+    <div class="stat-grid" id="statsGrid">
+      <div style="text-align:center"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 注入共用 CSS
+const style = document.createElement('style');
+style.textContent = `.spinner{display:inline-block;width:20px;height:20px;border:3px solid #f3f3f3;border-top:3px solid #2ecc71;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}`;
+document.head.appendChild(style);
+
+function checkAdmin() {
+  if (isAdmin()) {
+    document.getElementById('loginArea').style.display  = 'none';
+    document.getElementById('adminArea').style.display  = 'block';
+    loadStats();
+  }
+}
+
+document.getElementById('loginBtn').onclick = async () => {
+  const pwd = document.getElementById('adminPwd').value;
+  const r   = await api('adminLogin', { password: pwd });
+  if (r.status === 'success') {
+    localStorage.setItem('lrk_admin_token', r.adminToken);
+    checkAdmin();
+  } else {
+    const el = document.getElementById('loginErr');
+    el.textContent = r.msg || '密碼不正確';
+    el.style.display = 'block';
+  }
+};
+document.getElementById('adminPwd').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('loginBtn').click(); });
+
+document.getElementById('logoutLink').onclick = (e) => {
+  e.preventDefault();
+  localStorage.removeItem('lrk_admin_token');
+  location.reload();
+};
+
+async function loadStats() {
+  const r = await api('adminStats');
+  if (r.status !== 'success') return;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="num" style="color:#f39c12">${r.pending}</div><div class="lbl">待審核</div></div>
+    <div class="stat-card"><div class="num" style="color:#2ecc71">${r.approved}</div><div class="lbl">已通過</div></div>
+    <div class="stat-card"><div class="num" style="color:#e74c3c">${r.rejected}</div><div class="lbl">已拒絕</div></div>
+    <div class="stat-card"><div class="num">${numFmt(r.totalSigs)}</div><div class="lbl">總連署人數</div></div>
+    <div class="stat-card"><div class="num">${numFmt(r.totalVotes)}</div><div class="lbl">總投票次數</div></div>
+    <div class="stat-card"><div class="num" style="color:#3498db">${numFmt(r.todayVotes)}</div><div class="lbl">今日投票</div></div>
+  `;
+}
+
+checkAdmin();
+</script>
+</body>
+</html>
